@@ -10,7 +10,7 @@ export default function Page() {
   const handleSignOut =async ()=>{
     try{
       await signOut();
-      router.replace('./sign-in')
+      router.replace('./')
     }
     catch(err){
       console.log(err);
