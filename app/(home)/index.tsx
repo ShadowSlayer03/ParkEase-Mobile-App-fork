@@ -7,6 +7,10 @@ export default function Page() {
   const {signOut} = useAuth()
   const router = useRouter()
 
+  if(!user){
+    router.replace('/(auth)/sign-in');
+  }
+
   const handleSignOut =async ()=>{
     try{
       await signOut();
@@ -19,20 +23,13 @@ export default function Page() {
 
   return (
     <View className="h-screen">
-      <SignedIn>
+      {/* <SignedIn> */}
         <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-        <View>
+        {/* <View>
           <Button title='Jiidsf' onPress={handleSignOut}/>
-        </View>
-      </SignedIn>
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign In</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text>Sign Up</Text>
-        </Link>
-      </SignedOut>
+        </View> */}
+      {/* </SignedIn> */}
+
     </View>
   )
 }

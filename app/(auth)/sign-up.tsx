@@ -56,7 +56,7 @@ export default function SignUpScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
         <View>
           <View className="relative w-full">
-            <Image source={images.parkingP} className="z-0 w-[170px] h-32 my-20 ml-5" />
+            <Image source={images.parkingP} className="z-0 w-[170px] h-32 mt-20 mb-10 ml-5" />
             <Text className="text-2xl text-black absolute bottom-5 left-5">Welcome 👋</Text>
           </View>
           {!pendingVerification && (
