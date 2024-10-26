@@ -32,6 +32,8 @@ import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
 import signUpCar from "@/assets/images/signup-car.png";
 import parkingP from "@/assets/images/parkingP.png";
+import parking_layout from "@/assets/images/parking-layout.png";
+import parking_layout1 from "@/assets/images/parking-layout.jpg";
 
 export const images = {
   onboarding1,
@@ -43,6 +45,8 @@ export const images = {
   noResult,
   message,
   parkingP,
+  parking_layout,
+  parking_layout1
 };
 
 export const icons = {
