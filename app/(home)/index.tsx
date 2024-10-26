@@ -29,7 +29,7 @@ export default function Page() {
           <Button title='Jiidsf' onPress={handleSignOut}/>
         </View> */}
       {/* </SignedIn> */}
-
+          <Link href={'./Parking'}>Parking</Link>
     </View>
   )
 }

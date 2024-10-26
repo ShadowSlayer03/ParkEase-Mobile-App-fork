@@ -81,7 +81,7 @@ export default function SignUpScreen() {
               <InputField
                 label="Username"
                 placeholder="Username..."
-                icon={icons.lock}
+                icon={icons.person}
                 secureTextEntry={true}
                 textContentType="text"
                 value={username}
