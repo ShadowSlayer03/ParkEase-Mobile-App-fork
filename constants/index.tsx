@@ -23,6 +23,8 @@ import selectedMarker from "@/assets/icons/selected-marker.png";
 import star from "@/assets/icons/star.png";
 import target from "@/assets/icons/target.png";
 import to from "@/assets/icons/to.png";
+import navigation_arrow from "@/assets/icons/navigation_arrow.png"
+
 import check from "@/assets/images/check.png";
 import getStarted from "@/assets/images/get-started.png";
 import message from "@/assets/images/message.png";
@@ -35,7 +37,7 @@ import parkingP from "@/assets/images/parkingP.png";
 import parking_layout from "@/assets/images/parking-layout.png";
 import parking_layout1 from "@/assets/images/parking-layout.jpg";
 import parkingkaP from "@/assets/images/parking-p.png";
-import map_parkease from "@/assets/images/map-parkease"
+import map_parkease from "@/assets/images/map-parkease.png"
 
 export const images = {
   onboarding1,
@@ -50,7 +52,7 @@ export const images = {
   parking_layout,
   parking_layout1,
   parkingkaP,
-  map_parkease
+  map_parkease,
 };
 
 export const icons = {
@@ -69,6 +71,7 @@ export const icons = {
   lock,
   map,
   marker,
+  navigation_arrow,
   out,
   person,
   pin,
