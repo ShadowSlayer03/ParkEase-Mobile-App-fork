@@ -34,7 +34,7 @@ export default function Index() {
     >
       
       <Link href={'./(home)'}>Get Started > </Link>
-      <Link href={'./screens'}>yabs > </Link>
+      <Link href={'./screens/map'}>yabs > </Link>
     </View>
   );
 }
