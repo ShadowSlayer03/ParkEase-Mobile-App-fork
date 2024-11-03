@@ -1,22 +1,20 @@
 import CustomButton from '@/components/CustomButton';
+import LocationDetails from '@/components/LocationDetails';
+import App from '@/components/MapParking';
 import NavigationArrow from '@/components/NavigationArrow';
 import { icons, images } from '@/constants';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Path,Svg } from 'react-native-svg';
 
 const Map = () => {
-    const locationDeatils = {
-        name:"NIE-Admin Block",
-        location:"Manandvadi road, NIE",
-        list_details:{
-            distance:2100,spots_left:2,no_of_slots:20
-        }
-    }
+    const [detailsOfLocation, setDetailsOfLocation] = useState(true);
+    
     return (
         <View className="relative h-full bg-black">
-            <Image className="relative z-0 h-full w-full" source={images.map_parkease} />
+            <App setDetailsOfLocation={setDetailsOfLocation} />
+            {/* <Image className="relative z-0 h-full w-full" source={images.map_parkease} /> */}
                 {/*Top bar - list fo the parking lots */}
             <View className="absolute w-screen mt-12">
                 <View className="flex items-center mx-4">
@@ -64,27 +62,8 @@ const Map = () => {
                     </View>
                 </View>
             </View>
-            <View className="absolute bottom-0 w-screen">
-                <View className="bg-primary-300 rounded-t-2xl">
-                    <Text className="">
-                        {locationDeatils.name}
-                    </Text>
-                    <Text>
-                        {locationDeatils.location}
-                    </Text>
-                    <View>
-                        {/* {locationDeatils.list_details.map((x)=>{
-
-                        })} */}
-                    </View>
-                    <View className="mx-5 mb-8">
-                        <CustomButton 
-                        bgVariant="dark"
-                        title="Navigate"
-                        IconLeft={() => <NavigationArrow/>}
-                        />
-                    </View>
-                </View>
+            <View className="absolute bottom-0 w-screen overflow-hidden">
+                {detailsOfLocation && <LocationDetails setDetailsOfLocation={setDetailsOfLocation} />}
             </View>
         </View>
     );

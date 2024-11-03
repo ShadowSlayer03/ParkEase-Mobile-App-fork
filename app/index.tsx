@@ -1,10 +1,14 @@
 import { useFonts } from "expo-font";
 import { Link, SplashScreen } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+
+import * as Location from 'expo-location';
 
 export default function Index() {
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
   const [loaded] = useFonts({
     "Jakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
     "Jakarta-ExtraBold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
@@ -21,6 +25,27 @@ export default function Index() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
+
   if (!loaded) {
     return null;
   }
@@ -35,6 +60,7 @@ export default function Index() {
       
       <Link href={'./(home)'}>Get Started > </Link>
       <Link href={'./screens/map'}>yabs > </Link>
+      <Text>{text}</Text>
     </View>
   );
 }
