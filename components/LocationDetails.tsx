@@ -4,8 +4,17 @@ import Svg, { Path } from 'react-native-svg';
 import CustomButton from './CustomButton';
 import NavigationArrow from './NavigationArrow';
 import { TouchableOpacity } from 'react-native';
+import { destStore } from '@/store/useStore';
 
-const LocationDetails = ({setDetailsOfLocation}) => {
+const LocationDetails = () => {
+    const {destDetails} = destStore();
+    const  {clearDest} = destStore();
+
+    const navigateToDest = async()=>{
+        clearDest();
+        console.log("Naviagate");
+    }
+
     const locationDeatils = {
         name:"NIE-Admin Block",
         location:"Manandvadi road, NIE",
@@ -15,7 +24,7 @@ const LocationDetails = ({setDetailsOfLocation}) => {
     }
     return (
         <View className="relative px-2 bg-primary-300 rounded-t-2xl">
-                    <TouchableOpacity onPress={()=>{setDetailsOfLocation(false);}}>
+                    <TouchableOpacity onPress={()=>{clearDest()}}>
                     <View className="top-2 absolute z-20 w-full flex p-1 items-end justify-end">
                             <Svg fill="none" width={24} height={24} viewBox="0 0 24 24" strokeWidth={1.5} stroke="#57595d">
                                 <Path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -24,10 +33,10 @@ const LocationDetails = ({setDetailsOfLocation}) => {
                     </TouchableOpacity>
                     <View className="mt-5">
                         <Text className="text-xl font-JakartaBold">
-                            {locationDeatils.name}
+                            {destDetails.name}
                         </Text>
                         <Text className="text-base font-JakartaExtraLight">
-                            {locationDeatils.location}
+                            {destDetails.location}
                         </Text>
                     </View>
                     <View className="flex flex-row gap-3 py-4 overflow-x-scroll">
@@ -48,6 +57,7 @@ const LocationDetails = ({setDetailsOfLocation}) => {
                         <CustomButton 
                         bgVariant="dark"
                         title="Navigate"
+                        onPress={navigateToDest}
                         IconLeft={() => <NavigationArrow />}
                         />
                     </View>

@@ -3,17 +3,18 @@ import LocationDetails from '@/components/LocationDetails';
 import App from '@/components/MapParking';
 import NavigationArrow from '@/components/NavigationArrow';
 import { icons, images } from '@/constants';
+import { destStore } from '@/store/useStore';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Path,Svg } from 'react-native-svg';
 
 const Map = () => {
-    const [detailsOfLocation, setDetailsOfLocation] = useState(true);
+    const {showDestDetails} = destStore() 
     
     return (
         <View className="relative h-full bg-black">
-            <App setDetailsOfLocation={setDetailsOfLocation} />
+            <App />
             {/* <Image className="relative z-0 h-full w-full" source={images.map_parkease} /> */}
                 {/*Top bar - list fo the parking lots */}
             <View className="absolute w-screen mt-12">
@@ -63,7 +64,7 @@ const Map = () => {
                 </View>
             </View>
             <View className="absolute bottom-0 w-screen overflow-hidden">
-                {detailsOfLocation && <LocationDetails setDetailsOfLocation={setDetailsOfLocation} />}
+                {showDestDetails && <LocationDetails />}
             </View>
         </View>
     );
