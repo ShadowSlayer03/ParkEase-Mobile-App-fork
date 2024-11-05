@@ -1,18 +1,23 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import CustomButton from './CustomButton';
 import NavigationArrow from './NavigationArrow';
 import { TouchableOpacity } from 'react-native';
 import { destStore } from '@/store/useStore';
 
-const LocationDetails = () => {
-    const {destDetails} = destStore();
-    const  {clearDest} = destStore();
+import * as Linking from 'expo-linking'
+import { userStore } from '@/store/userLocationStore';
+import Animated, { SlideInDown, SlideInUp, SlideOutDown, useSharedValue } from 'react-native-reanimated';
 
-    const navigateToDest = async()=>{
-        clearDest();
-        console.log("Naviagate");
+const LocationDetails = () => {
+    const {destDetails, clearDest} = destStore();
+    const {userLocation, setNavigationStatus} = userStore();
+
+    const offset = useSharedValue(0)
+
+    const navigateToDest = ()=>{
+        setNavigationStatus(true);
     }
 
     const locationDeatils = {
@@ -23,7 +28,9 @@ const LocationDetails = () => {
         }
     }
     return (
-        <View className="relative px-2 bg-primary-300 rounded-t-2xl">
+        <Animated.View
+        entering={SlideInDown.springify()}
+        className="relative px-2 bg-primary-300 rounded-t-2xl">
                     <TouchableOpacity onPress={()=>{clearDest()}}>
                     <View className="top-2 absolute z-20 w-full flex p-1 items-end justify-end">
                             <Svg fill="none" width={24} height={24} viewBox="0 0 24 24" strokeWidth={1.5} stroke="#57595d">
@@ -39,7 +46,8 @@ const LocationDetails = () => {
                             {destDetails.location}
                         </Text>
                     </View>
-                    <View className="flex flex-row gap-3 py-4 overflow-x-scroll">
+                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} >
+                    <View className="flex flex-row gap-3 py-4">
                         <Text className="text-base font-JakartaMedium py-1 px-2 rounded-full bg-primary-200">
                             {locationDeatils.list_details.distance/1000} km
                         </Text>
@@ -53,6 +61,7 @@ const LocationDetails = () => {
                             {locationDeatils.list_details.spots_left} spots available
                         </Text>
                     </View>
+                    </ScrollView>
                     <View className="mx-2 mb-8">
                         <CustomButton 
                         bgVariant="dark"
@@ -61,7 +70,8 @@ const LocationDetails = () => {
                         IconLeft={() => <NavigationArrow />}
                         />
                     </View>
-                </View>
+                    <View className="Extra h-32"></View>
+        </Animated.View>
     );
 }
 
