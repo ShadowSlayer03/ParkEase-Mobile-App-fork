@@ -39,6 +39,7 @@ import parking_layout1 from "@/assets/images/parking-layout.jpg";
 import parkingkaP from "@/assets/images/parking-p.png";
 import map_parkease from "@/assets/images/map-parkease.png"
 import marker_icon from "@/assets/images/marker_icon.png"
+import car_marker from "@/assets/images/car_marker.png"
 
 export const images = {
   onboarding1,
@@ -54,7 +55,8 @@ export const images = {
   parking_layout1,
   parkingkaP,
   map_parkease,
-  marker_icon
+  marker_icon,
+  car_marker
 };
 
 export const icons = {

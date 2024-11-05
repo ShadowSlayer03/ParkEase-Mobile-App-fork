@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 import * as Location from 'expo-location';
+import { userStore } from "@/store/userLocationStore";
 
 export default function Index() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  const {userLocation,setUserLocation} = userStore()
 
   const [loaded] = useFonts({
     "Jakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
@@ -35,6 +38,7 @@ export default function Index() {
       }
 
       let location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location.coords)
       setLocation(location);
     })();
   }, []);
@@ -60,7 +64,8 @@ export default function Index() {
       
       <Link href={'./(home)'}>Get Started > </Link>
       <Link href={'./screens/map'}>yabs > </Link>
-      <Text>{text}</Text>
+      {/* <Text>{text}</Text> */}
+      <Text>{userLocation?.latitude}</Text>
     </View>
   );
 }
