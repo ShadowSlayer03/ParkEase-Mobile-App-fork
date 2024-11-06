@@ -70,8 +70,8 @@ const Map = () => {
             <View className="absolute -bottom-32 w-screen overflow-hidden">
                 {showDestDetails && <LocationDetails />}
             </View>
-            <View className="absolute bottom-0 w-screen">
-                {showFilter && <Filters />}
+            <View className="z-40 absolute bottom-0 w-screen">
+                {showFilter && <Filters setShowFilter={setShowFilter} />}
             </View>
         </View>
     );

@@ -19,6 +19,9 @@ const getBgVariantStyle = (variant: ButtonProps["bgVariant"]) => {
     case "main":
       return "bg-[#ffd602]";
       break;
+    case "less-dark":
+      return "bg-[#57595d]";
+      break;
     case "dark":
       return "bg-[#000]";
       break;
@@ -69,7 +72,7 @@ const CustomButton = ({
       {...props}
     >
       {IconLeft && <IconLeft />}
-      <Text className={`text-[16px] px-1 font-JakartaBold ${getTextVariantStyle(textVariant)}`}>
+      <Text className={`text-[16px] px-1 font-JakartaMedium ${getTextVariantStyle(textVariant)}`}>
         {title}
       </Text>
       {IconRight && <IconRight />}
