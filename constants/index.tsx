@@ -34,7 +34,6 @@ import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
 import signUpCar from "@/assets/images/signup-car.png";
 import parkingP from "@/assets/images/parkingP.png";
-import parking_layout from "@/assets/images/parking-layout.png";
 import parking_layout1 from "@/assets/images/parking-layout.jpg";
 import parkingkaP from "@/assets/images/parking-p.png";
 import map_parkease from "@/assets/images/map-parkease.png"
@@ -51,7 +50,6 @@ export const images = {
   noResult,
   message,
   parkingP,
-  parking_layout,
   parking_layout1,
   parkingkaP,
   map_parkease,

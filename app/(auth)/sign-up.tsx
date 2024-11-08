@@ -6,19 +6,39 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import { icons, images } from "@/constants";
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBanner from '@/components/Alert';
+import { alertStore } from '@/store/alertStore';
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp()
   const router = useRouter()
 
-  const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [emailAddress, setEmailAddress] = React.useState(null)
+  const [password, setPassword] = React.useState(null)
   const [pendingVerification, setPendingVerification] = React.useState(false)
-  const [code, setCode] = React.useState('')
-  const [username, setUsername] = React.useState('')
+  const [code, setCode] = React.useState(null)
+  const [username, setUsername] = React.useState(null);
+
+  const {setStatusCode, setMsg, showAlert, setShowAlert} = alertStore();
+
+  console.log("hii",showAlert);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
+
+    if(!emailAddress || !password || !username){
+      setShowAlert();
+      setStatusCode(400);
+      setMsg('Fill All the Fields');
+      return;
+    }
+
+    else if(username && username.length < 4){
+      setShowAlert();
+      setStatusCode(400);
+      setMsg("The Username should contain atleast 4 characters");
+      return;
+    }
 
     try {
       await signUp.create({ emailAddress, password, username });
@@ -26,6 +46,9 @@ export default function SignUpScreen() {
       setPendingVerification(true);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
+      setStatusCode(422);
+      setMsg(err?.errors[0]?.longMessage);
+      setShowAlert();
     }
   }
 
@@ -54,6 +77,7 @@ export default function SignUpScreen() {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
         <View>
+     { showAlert && <AlertBanner />}
           <View className="relative w-full">
             <Image source={images.parkingP} className="z-0 w-[170px] h-32 mt-20 mb-10 ml-5" />
             <Text className="text-2xl text-black absolute bottom-5 left-5">Welcome 👋</Text>
@@ -90,6 +114,7 @@ export default function SignUpScreen() {
                 title="Sign up"
                 onPress={onSignUpPress}
                 className="mt-10"
+                bgVariant="brown"
               />
             </View>
           )}
@@ -109,7 +134,7 @@ export default function SignUpScreen() {
         <View>
           <Link
               href="/sign-in"
-              className="text-md text-center text-general-200 mt-10"
+              className="text-md text-center text-general-200 mt-5"
             >
             Already have an account?{" "}
             <Text className="text-primary-500">Sign In</Text>

@@ -70,9 +70,10 @@ export default function Page() {
         onChangeText={(password) => setPassword(password)}
       />
       <CustomButton
-        title="Sign up"
+        title="Sign In"
         onPress={onSignInPress}
         className="mt-10"
+        bgVariant="brown"
         />
       </View>
       <View>
