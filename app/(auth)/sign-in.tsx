@@ -1,5 +1,5 @@
-import { useSignIn } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
+import { useSignIn, useUser } from '@clerk/clerk-expo'
+import { Link, useNavigation, useRouter } from 'expo-router'
 import { Text, TextInput, Button, View, ScrollView, Image } from 'react-native'
 import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -13,6 +13,13 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+
+  const user = useUser();
+  const naviagte = useNavigation().navigate;
+
+  // if(user){
+  //   naviagte('screens');
+  // }
 
   const onSignInPress = React.useCallback(async () => {
     if (!isLoaded) {
@@ -81,8 +88,17 @@ export default function Page() {
             href="/sign-up"
             className="text-md text-center text-general-200 mt-10"
           >
-          Don't have an account?{" "}
-          <Text className="text-primary-500">Sign Up</Text>
+          Don't have an account?
+          <Text className="text-primary-500"> Sign Up</Text>
+        </Link>
+      </View>
+      <View>
+          <Link
+            href="/forget-password"
+            className="text-md text-center text-general-200"
+          >
+          Forgot your password?
+          <Text className="text-primary-500"> Click</Text>
         </Link>
       </View>
     </View>

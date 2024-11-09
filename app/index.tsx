@@ -21,7 +21,7 @@ export default function Index() {
       navigate('(auth)');
     }
     else{
-      navigate('(screen');
+      navigate('(screens)');
     }
   }
 

@@ -1,13 +1,9 @@
-import CustomButton from '@/components/CustomButton';
 import Filters from '@/components/Filters';
 import LocationDetails from '@/components/LocationDetails';
 import App from '@/components/MapParking';
-import NavigationArrow from '@/components/NavigationArrow';
-import { icons, images } from '@/constants';
 import { destStore } from '@/store/useStore';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { Path,Svg } from 'react-native-svg';
 
 const Map = () => {

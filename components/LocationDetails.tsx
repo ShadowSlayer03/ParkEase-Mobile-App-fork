@@ -31,13 +31,13 @@ const LocationDetails = () => {
         <Animated.View
         entering={SlideInDown.springify()}
         className="relative px-2 bg-primary-300 rounded-t-2xl">
-                    <TouchableOpacity onPress={()=>{clearDest()}}>
                     <View className="top-2 absolute z-20 w-full flex p-1 items-end justify-end">
+                    <TouchableOpacity onPress={()=>{clearDest()}}>
                             <Svg fill="none" width={24} height={24} viewBox="0 0 24 24" strokeWidth={1.5} stroke="#57595d">
                                 <Path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </Svg>
-                    </View>
                     </TouchableOpacity>
+                    </View>
                     <View className="mt-5">
                         <Text className="text-xl font-JakartaBold">
                             {destDetails.name}
