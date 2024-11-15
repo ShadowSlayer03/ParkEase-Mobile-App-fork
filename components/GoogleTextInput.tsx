@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { GoogleInputProps } from "@/types/type";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { icons } from "@/constants";
@@ -11,36 +11,29 @@ const GoogleTextInput = ({
   textInputBackgroundColor,
   handlePress,
 }: GoogleInputProps) => {
+
   return (
     <View
-      className={`flex flex-row items-center justify-center relative z-50 rounded-xl ${containerStyle} mb-5`}
+      className={`flex-1 bg-primary-500 rounded-full items-center justify-center ${containerStyle}`} // Ensure full flexbox layout
     >
       <GooglePlacesAutocomplete
         fetchDetails={true}
-        placeholder="Search Destination"
         debounce={200}
         styles={{
           textInputContainer: {
-            alignItems: "center",
-            justifyContent: "center",
+            alignSelf: "center", // Align the input in the center of its parent
             borderRadius: 20,
-            marginHorizontal: 20,
-            position: "relative",
-            shadowColor: "#d4d4d4",
           },
           textInput: {
-            backgroundColor: textInputBackgroundColor || "white",
+            backgroundColor: "transparent",
             fontSize: 16,
             fontWeight: "600",
-            marginTop: 5,
-            width: "100%",
-            borderRadius: 200,
+            height: 50,
+            borderRadius: 25,
+            paddingHorizontal: 20,
           },
           listView: {
-            backgroundColor: textInputBackgroundColor || " transparent ",
-            position: "relative",
-            top: 0,
-            width: "100%",
+            backgroundColor: textInputBackgroundColor || "#ffffff",
             borderRadius: 10,
             shadowColor: "#d4d4d4",
             zIndex: 99,
@@ -58,16 +51,20 @@ const GoogleTextInput = ({
           language: "en",
         }}
         renderLeftButton={() => (
-          <View className="justify-center items-center w-6 h-6">
-            <Image
-              source={icon ? icon : icons.search}
-              className="w-6 h-6"
-              resizeMode="contain"
-            />
+          <View className="justify-center items-center px-4">
+              <TouchableOpacity
+                onPress={handlePress}
+              >
+              <Image
+                source={icon ? icon : icons.close}
+                className="w-6 h-6"
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
           </View>
         )}
         textInputProps={{
-          placeholderTextColor: "gray",
+          placeholderTextColor: "grey",
           placeholder: initialLocation ?? "Where do you want to go?",
         }}
       />

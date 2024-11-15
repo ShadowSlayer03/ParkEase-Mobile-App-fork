@@ -6,6 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { icons, images } from '@/constants'
 import InputField from '@/components/InputField'
 import CustomButton from '@/components/CustomButton'
+import { alertStore } from '@/store/alertStore'
+import AlertBanner from '@/components/Alert'
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -13,7 +15,7 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
-
+  const {setStatusCode, setMsg, showAlert, setShowAlert} = alertStore();
   const user = useUser();
   const navigate = useNavigation().navigate;
 
@@ -24,6 +26,13 @@ export default function Page() {
   const onSignInPress = React.useCallback(async () => {
     if (!isLoaded) {
       return
+    }
+
+    if(!emailAddress || !password){
+      setShowAlert();
+      setStatusCode(400);
+      setMsg('Fill All the Fields');
+      return;
     }
 
     try {
@@ -41,7 +50,10 @@ export default function Page() {
         console.error(JSON.stringify(signInAttempt, null, 2))
       }
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2))
+      console.log(JSON.stringify(err, null, 2))
+      setStatusCode(422);
+      setMsg(err?.errors[0]?.longMessage);
+      setShowAlert();
     }
   }, [isLoaded, emailAddress, password])
 
@@ -54,6 +66,7 @@ export default function Page() {
     >
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
     <View>
+    { showAlert && <AlertBanner />}
       <View className="relative w-full">
           <Image source={images.parkingP} className="z-0 w-[170px] h-32 my-20 ml-5" />
           <Text className="text-2xl text-black absolute bottom-5 left-5 items-baseline">Welcome back 🙏</Text>

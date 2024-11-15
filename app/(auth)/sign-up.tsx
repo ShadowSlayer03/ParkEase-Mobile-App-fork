@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { TextInput, Image, Button, View, Text, ScrollView } from 'react-native'
+import {useEffect} from 'react'
+import { TextInput, Image, Button, View, Text, ScrollView, BackHandler, Alert } from 'react-native'
 import { useSignUp, useUser } from '@clerk/clerk-expo'
 import { Link, useNavigation, useRouter } from 'expo-router'
 import CustomButton from "@/components/CustomButton";
@@ -27,6 +28,33 @@ export default function SignUpScreen() {
   const [username, setUsername] = React.useState(null);
 
   const {setStatusCode, setMsg, showAlert, setShowAlert} = alertStore();
+  
+  //backpresshandler 
+  useEffect(() => {
+    const backAction = () => {
+        // You can modify this logic based on your app's needs.
+            // You can either navigate to another screen or exit the app
+            Alert.alert('Hold on!', 'Are you sure you want to exit?', [
+                {
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel',
+                },
+                {
+                    text: 'YES',
+                    onPress: () => BackHandler.exitApp(),
+                },
+            ]);
+            return true; // Prevent default back action
+    };
+
+    BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    // Cleanup the listener on unmount
+    return () => {
+        BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
+}, []);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
