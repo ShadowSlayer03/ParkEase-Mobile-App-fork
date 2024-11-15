@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
-import { SafeAreaView } from "react-native";
 import "react-native-reanimated";
+import 'react-native-get-random-values';
 
 export default function AuthLayout() {
   return (

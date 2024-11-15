@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { TextInput, Image, Button, View, Text, ScrollView } from 'react-native'
-import { useSignUp } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
+import { useSignUp, useUser } from '@clerk/clerk-expo'
+import { Link, useNavigation, useRouter } from 'expo-router'
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import { icons, images } from "@/constants";
@@ -11,6 +11,13 @@ import { alertStore } from '@/store/alertStore';
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp()
+  const user = useUser();
+  console.log(user);
+  const navigate = useNavigation().navigate;
+  if(user?.isSignedIn){
+    navigate('(screens)');
+    return;
+  }
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState(null)
@@ -20,8 +27,6 @@ export default function SignUpScreen() {
   const [username, setUsername] = React.useState(null);
 
   const {setStatusCode, setMsg, showAlert, setShowAlert} = alertStore();
-
-  console.log("hii",showAlert);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -59,12 +64,13 @@ export default function SignUpScreen() {
       const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
+        console.log()
         router.replace('/');
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.log(JSON.stringify(err, null, 2));
     }
   }
 
@@ -83,7 +89,7 @@ export default function SignUpScreen() {
             <Text className="text-2xl text-black absolute bottom-5 left-5">Welcome 👋</Text>
           </View>
           {!pendingVerification && (
-            <View className="p-4">
+            <View className="p-3">
               <InputField
                 label="Email"
                 placeholder="Enter email"
@@ -105,7 +111,7 @@ export default function SignUpScreen() {
                 label="Username"
                 placeholder="Username..."
                 icon={icons.person}
-                secureTextEntry={true}
+                secureTextEntry={false}
                 textContentType="text"
                 value={username}
                 onChangeText={(username) => setUsername(username)}
@@ -134,7 +140,7 @@ export default function SignUpScreen() {
         <View>
           <Link
               href="/sign-in"
-              className="text-md text-center text-general-200 mt-5"
+              className="text-md text-center text-general-200 mt-2"
             >
             Already have an account?{" "}
             <Text className="text-primary-500">Sign In</Text>

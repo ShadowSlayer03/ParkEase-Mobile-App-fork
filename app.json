@@ -4,7 +4,7 @@
     "slug": "ParkEase",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon_parkease.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -13,7 +13,8 @@
       "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "newArchEnabled": true
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +25,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.sbmunnu.ParkEase"
+      "package": "com.sbmunnu.ParkEase",
+      "newArchEnabled": true
     },
     "web": {
       "bundler": "metro",

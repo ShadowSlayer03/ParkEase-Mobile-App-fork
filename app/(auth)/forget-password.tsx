@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
     try {
       const result = await signIn.attemptFirstFactor({ strategy: 'reset_password_email_code', code, password });
       if (result.status === 'complete') {
-        router.replace('/sign-in');
+        router.replace('(screens)');
       } else {
         console.error(JSON.stringify(result, null, 2));
       }

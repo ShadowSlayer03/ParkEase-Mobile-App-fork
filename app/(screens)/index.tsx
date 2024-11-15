@@ -1,7 +1,10 @@
 import Filters from '@/components/Filters';
+import GoogleTextInput from '@/components/GoogleTextInput';
 import LocationDetails from '@/components/LocationDetails';
 import App from '@/components/MapParking';
-import { destStore } from '@/store/useStore';
+import { destStore } from '@/store/destStore';
+import { useUser } from '@clerk/clerk-expo';
+import { router, useNavigation } from 'expo-router';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Path,Svg } from 'react-native-svg';
@@ -9,6 +12,13 @@ import { Path,Svg } from 'react-native-svg';
 const Map = () => {
     const {showDestDetails} = destStore() ;
     const [showFilter, setShowFilter] = useState(false);
+    const [googleSearch, setGooglesearch] = useState(false);
+    const navigate = useNavigation().navigate;
+
+    const { isSignedIn } = useUser();
+    if(!isSignedIn){
+        navigate('(auth)')
+    }
     
     return (
         <View className="relative h-full bg-black">
@@ -17,14 +27,25 @@ const Map = () => {
                 {/*Top bar - list fo the parking lots */}
             <View className="absolute w-screen mt-12">
                 <View className="flex items-center mx-4">
+                   {googleSearch ? 
+                    <GoogleTextInput
+                          initialLocation={" Free parking lots nearby "}
+                          containerStyle={"  "}
+                          handlePress={()=> {setGooglesearch(false)}}
+                          /> 
+                    :
                     <View className="rounded-2xl w-full bg-black flex flex-row justify-between px-2 py-4">
                         <View className="bg-primary-700 rounded-full flex flex-row justify-between">
                             <View className="h-9 w-9 flex justify-center items-center bg-primary-300 rounded-full">
                                <Text className="text-xl text-black">6</Text>
                             </View>
-                            <View className="px-2 flex justify-center">
-                                <Text className="text-base text-white">Free parking lots nearby</Text>
-                            </View>
+                            <TouchableOpacity
+                                onPress={()=> setGooglesearch(true)}
+                            >
+                                <View className="px-2 flex justify-center items-center">
+                                    <Text className="text-center text-base text-white">Free parking lots nearby</Text>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View 
                         className="flex flex-row justify-around bg-primary-500 px-2 items-center rounded-full"
@@ -39,7 +60,8 @@ const Map = () => {
                         </Svg>
                             <Text className="text-base text-white px-2">List</Text>
                         </View>
-                    </View>
+                    </View> 
+                    }
                 </View>
                 {/* search icon */}
                 <View className="flex relative">

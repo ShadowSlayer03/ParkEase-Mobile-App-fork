@@ -15,11 +15,11 @@ export default function Page() {
   const [password, setPassword] = React.useState('')
 
   const user = useUser();
-  const naviagte = useNavigation().navigate;
+  const navigate = useNavigation().navigate;
 
-  // if(user){
-  //   naviagte('screens');
-  // }
+  if(user?.isSignedIn){
+    navigate('(screens)');
+  }
 
   const onSignInPress = React.useCallback(async () => {
     if (!isLoaded) {
@@ -34,7 +34,7 @@ export default function Page() {
 
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId })
-        router.replace('/')
+        router.replace('(screens)')
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling
         // for more info on error handling

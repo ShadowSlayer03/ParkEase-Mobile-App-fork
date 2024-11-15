@@ -4,18 +4,31 @@ import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-na
 import Svg, { Path } from 'react-native-svg';
 import * as Location from 'expo-location';
 import { markers } from '@/assets/parkingareas/markers';
-import { destStore } from '@/store/useStore';
-import { userStore } from '@/store/userLocationStore';
+import { destStore } from '@/store/destStore';
 import { images } from '@/constants';
-import { useStore } from 'zustand';
 import MapViewDirections from 'react-native-maps-directions';
+import { userLocationStore } from '@/store/userLocationStore';
 
 export default function App() {
     const mapRef = useRef();
-    const { destDetails, setDest } = destStore();
-    const { userLocation, setUserLocation, navigationStatus } = userStore();
+    const { destDetails, setDest,navigationStatus,showDestDetails } = destStore();
+    const { userLocation, setUserLocation } = userLocationStore();
     const [heading, setHeading] = useState(0);
+    const origin = {
+      latitude: 12.281595463194263,
+      longitude: 76.64082574099395,
+      name: 'GJB'
+    };
+    const destination = {
+      latitude: 12.283828309006749, 
+      longitude: 76.64158989783473,
+      name: 'Admin Block'
+    };
 
+    console.log(showDestDetails);
+
+    const EXPO_PUBLIC_GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+    console.log(EXPO_PUBLIC_GOOGLE_API_KEY);
 //     useEffect(() => {
 //       const getUserLocation = async () => {
 //         try {
@@ -108,7 +121,7 @@ export default function App() {
                   <View className="">
                       <Image 
                           source={images.marker_icon} 
-                          className="w-10 h-10 rounded-full" 
+                          className="w-9 h-9 rounded-full" 
                       />
                   </View>
                 </Marker>
@@ -118,7 +131,9 @@ export default function App() {
           <MapViewDirections
             origin={userLocation}
             destination={destDetails}
-            apikey={''}
+            apikey={EXPO_PUBLIC_GOOGLE_API_KEY}
+            strokeWidth={4}  // Set line thickness
+            strokeColor="#FFD602"
           />
         }
       </MapView>  

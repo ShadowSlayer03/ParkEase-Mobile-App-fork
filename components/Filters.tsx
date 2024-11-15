@@ -72,12 +72,12 @@ const Filters = ({ setShowFilter }) => {
             <Text className="bg-[#575757] rounded-full h-2 w-12 m-2"></Text>
           </View>
           <View>
-            <Text className="font-JakartaBold text-white text-center">Filters</Text>
+            <Text className="p-3 font-JakartaBold text-white text-center">Filters</Text>
           </View>
           <Text className="w-screen border-t h-1 border-primary-500"></Text>
           <View className="mx-2">
             <View className="flex flex-row justify-between">
-              <Text className="font-JakartaLight my-2 text-white">Show only free parking spots</Text>
+              <Text className="font-Jakarta px-2 py-4 text-white">Show only free parking spots</Text>
               <Switch
                 trackColor={{ true: '#b59801', false: "#000" }}
                 thumbColor={"#FFD602"}
@@ -85,12 +85,12 @@ const Filters = ({ setShowFilter }) => {
                 value={isEnabled}
               />
             </View>
-            <View>
+            {/* <View>
               <Text className="text-white">Select the parking type</Text>
               <View></View>
-            </View>
+            </View> */}
             <View>
-              <Text className="text-white">Select additional options</Text>
+              <Text className="text-white py-3 px-2 font-Jakarta">Select additional options</Text>
               <View className="w-full flex gap-2 flex-wrap flex-row">
                 {filterOptions.map((item, ind) => {
                   return (
@@ -109,7 +109,7 @@ const Filters = ({ setShowFilter }) => {
                 })}
               </View>
             </View>
-            <View className="flex flex-row justify-between">
+            <View className="flex flex-row py-3 justify-between">
               <Text className="p-2 text-white">Distance</Text>
               <View className="flex flex-row gap-4">
                 <Text className="p-2 text-white">{Math.ceil(distanceRange)}</Text>
@@ -128,8 +128,8 @@ const Filters = ({ setShowFilter }) => {
                 </View>
               </View>
             </View>
-            <View className="flex justify-center">
-              <TouchableWithoutFeedback
+            <View className="flex justify-center pb-4">
+            <TouchableWithoutFeedback
                 onPressIn={() => setIsSliderActive(true)}
                 onPressOut={() => setIsSliderActive(false)}
               >
@@ -141,11 +141,15 @@ const Filters = ({ setShowFilter }) => {
                   minimumTrackTintColor='#FFD602'
                 />
               </TouchableWithoutFeedback>
+              <View className="flex px-2 flex-row w-full justify-between">
+              <Text className="text-white">2</Text>
+              <Text className="text-white">100</Text>
+              </View>
             </View>
             <View></View>
           </View>
           <Text className="w-screen border-t h-1 border-primary-500"></Text>
-          <View className="flex-row space-x-4">
+          <View className="flex-row space-x-4 p-3">
             <View className="flex-1">
               <CustomButton
                 onPress={() => {/* Handle clear action here */}}

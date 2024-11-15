@@ -2,12 +2,21 @@ import { Tabs } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { tablist, svgs } from '../../constants/tabConstants';
 import { Text } from 'react-native';
+import React from 'react';
 
 export default function Layout() {
+  const getTabBarLabel = (focused, title) => {
+    return (
+      <Text className={`${focused ? "text-black" : "text-gray-400"} font-JakartaBold`}>
+        {title}
+      </Text>
+    );
+  };
+
   return (
     <Tabs
       screenOptions={{
-        tabBarShowLabel: true, // Ensure label is displayed
+        tabBarShowLabel: true,
         tabBarIndicatorStyle: {
           height: 4,
           position: 'absolute',
@@ -17,11 +26,7 @@ export default function Layout() {
           height: 60,
           backgroundColor: '#ffffff',
           borderTopWidth: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
         },
-        
       }}
     >
       {tablist.map((item) => (
@@ -30,13 +35,9 @@ export default function Layout() {
           name={item.name}
           options={{
             headerShown: false,
+            lazy: true, // Only load tabs when accessed
             tabBarIcon: ({ focused }) => svgs[item.name](focused),
-            tabBarLabel: ({focused}) => (
-              <Text className={`${focused?"text-black ":"text-gray-400 "} font-JakartaBold `}>
-                  {item.title}
-                </Text>
-            ),
-            
+            tabBarLabel: ({ focused }) => getTabBarLabel(focused, item.title),
           }}
         />
       ))}

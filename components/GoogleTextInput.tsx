@@ -37,7 +37,7 @@ const GoogleTextInput = ({
             borderRadius: 200,
           },
           listView: {
-            backgroundColor: textInputBackgroundColor || "white",
+            backgroundColor: textInputBackgroundColor || " transparent ",
             position: "relative",
             top: 0,
             width: "100%",

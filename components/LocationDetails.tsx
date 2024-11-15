@@ -4,17 +4,13 @@ import Svg, { Path } from 'react-native-svg';
 import CustomButton from './CustomButton';
 import NavigationArrow from './NavigationArrow';
 import { TouchableOpacity } from 'react-native';
-import { destStore } from '@/store/useStore';
+import { destStore } from '@/store/destStore';
 
-import * as Linking from 'expo-linking'
-import { userStore } from '@/store/userLocationStore';
+import { userLocationStore } from '@/store/userLocationStore';
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, useSharedValue } from 'react-native-reanimated';
 
 const LocationDetails = () => {
-    const {destDetails, clearDest} = destStore();
-    const {userLocation, setNavigationStatus} = userStore();
-
-    const offset = useSharedValue(0)
+    const {destDetails, clearDest ,setNavigationStatus} = destStore();
 
     const navigateToDest = ()=>{
         setNavigationStatus(true);
@@ -74,7 +70,5 @@ const LocationDetails = () => {
         </Animated.View>
     );
 }
-
-const styles = StyleSheet.create({})
 
 export default LocationDetails;

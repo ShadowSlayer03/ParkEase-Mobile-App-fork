@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export const userStore = create ((set)=>({
+export const userLocationStore = create ((set)=>({
     userLocation:null,
     setUserLocation:(details) => set(()=> ({userLocation: details})),
 }))
