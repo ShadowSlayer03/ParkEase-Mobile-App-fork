@@ -26,7 +26,8 @@ const LocationDetails = () => {
     },
   };
 
-  const { data, isLoading, error } = useApi("/api/locationDetails");
+  const { data, isLoading, error } = useApi("http://localhost:3000/locationDetails");
+  console.log("Result obtained:",data);
 
   return (
     <Animated.View
@@ -70,9 +71,6 @@ const LocationDetails = () => {
         showsHorizontalScrollIndicator={false}
       >
         <View className="flex flex-row gap-3 py-4">
-          <Text className="text-base font-FunnelDisplayMedium py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails.list_details.distance / 1000} km
-          </Text>
           <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
             {locationDetails.list_details.no_of_slots} spots present
           </Text>
