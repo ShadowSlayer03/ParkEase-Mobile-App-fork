@@ -1,10 +1,10 @@
+import React from "react";
 import { useFonts } from "expo-font";
-import { Link, SplashScreen, useNavigation } from "expo-router";
+import { SplashScreen, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, Text, View, Alert } from "react-native";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
 import "react-native-get-random-values";
-import * as Location from "expo-location";
-import { userLocationStore } from "@/store/userLocationStore";
 import CustomButton from "@/components/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/constants";
@@ -12,26 +12,31 @@ import { useUser } from "@clerk/clerk-expo";
 
 export default function Index() {
   const [errorMsg, setErrorMsg] = useState("");
-  const { setUserLocation } = userLocationStore();
-  const { user, isSignedIn } = useUser();
-  const navigate = useNavigation().navigate;
+  const { isSignedIn } = useUser();
+  const router = useRouter();
 
   const handlePress = () => {
     if (!isSignedIn) {
-      navigate("(auth)");
+      router.push("(auth)/welcome");
     } else {
-      navigate("(screens)");
+      router.push("(screens)");
     }
   };
 
   const [loaded] = useFonts({
-    "Jakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
-    "Jakarta-ExtraBold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
-    "Jakarta-ExtraLight": require("../assets/fonts/PlusJakartaSans-ExtraLight.ttf"),
-    "Jakarta-Light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
-    "Jakarta-Medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
-    "Jakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-    "Jakarta-SemiBold": require("../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+    "Funnel-Sans-Bold": require("../assets/fonts/FunnelSans-Bold.ttf"),
+    "Funnel-Sans-ExtraBold": require("../assets/fonts/FunnelSans-ExtraBold.ttf"),
+    "Funnel-Sans-Light": require("../assets/fonts/FunnelSans-Light.ttf"),
+    "Funnel-Sans-Medium": require("../assets/fonts/FunnelSans-Medium.ttf"),
+    "Funnel-Sans-Regular": require("../assets/fonts/FunnelSans-Regular.ttf"),
+    "Funnel-Sans-SemiBold": require("../assets/fonts/FunnelSans-SemiBold.ttf"),
+
+    "Funnel-Display-Bold": require("../assets/fonts/FunnelDisplay-Bold.ttf"),
+    "Funnel-Display-ExtraBold": require("../assets/fonts/FunnelDisplay-ExtraBold.ttf"),
+    "Funnel-Display-Light": require("../assets/fonts/FunnelDisplay-Light.ttf"),
+    "Funnel-Display-Medium": require("../assets/fonts/FunnelDisplay-Medium.ttf"),
+    "Funnel-Display-Regular": require("../assets/fonts/FunnelDisplay-Regular.ttf"),
+    "Funnel-Display-SemiBold": require("../assets/fonts/FunnelDisplay-SemiBold.ttf"),
   });
 
   useEffect(() => {
@@ -39,32 +44,6 @@ export default function Index() {
       SplashScreen.hideAsync().catch(console.warn);
     }
   }, [loaded]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          return;
-        }
-
-        let location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location.coords);
-      } catch (error) {
-        setErrorMsg("An error occurred while fetching location");
-        console.error(error);
-      }
-    })();
-  }, []);
-
-  if (errorMsg) {
-    return (
-      <View>
-        <Text>{errorMsg}</Text>
-      </View>
-    );
-  }
 
   if (!loaded) {
     return null;
@@ -74,21 +53,68 @@ export default function Index() {
     <SafeAreaView className="flex-1 bg-black">
       <View className="relative h-full mt-5 animate-bounce">
         <Image source={images.parkingkaP} style={{ height: 500, width: 300 }} />
-        <View className="absolute top-[320px] left-12 pt-2 gap-3">
+        <View className="absolute top-[340px] left-20 gap-3">
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontFamily: "Jakarta-Bold", color: "#fff", fontSize: 32 }}>Find </Text>
-            <Text style={{ fontFamily: "Jakarta-Bold", color: "#FFD700", fontSize: 32 }}>Free</Text>
+            <Text
+              style={{
+                fontFamily: "Funnel-Display-Bold",
+                color: "#fff",
+                fontSize: 35,
+              }}
+            >
+              Find{" "}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Funnel-Display-Bold",
+                color: "#FFD700",
+                fontSize: 35,
+              }}
+            >
+              Free
+            </Text>
           </View>
-          <Text style={{ fontFamily: "Jakarta-Bold", color: "#fff", fontSize: 32 }}>Street Parking</Text>
+          <Text
+            style={{
+              fontFamily: "Funnel-Display-Bold",
+              color: "#fff",
+              fontSize: 35,
+            }}
+          >
+            Street Parking
+          </Text>
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontFamily: "Jakarta-Bold", color: "#fff", fontSize: 32 }}>with </Text>
-            <Text style={{ fontFamily: "Jakarta-Bold", color: "#FFD700", fontSize: 32 }}>Parkease</Text>
+            <Text
+              style={{
+                fontFamily: "Funnel-Display-Bold",
+                color: "#fff",
+                fontSize: 35,
+              }}
+            >
+              with{" "}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Funnel-Display-Bold",
+                color: "#FFD700",
+                fontSize: 35,
+              }}
+            >
+              ParkEase
+            </Text>
           </View>
         </View>
-        <View style={{ position: "absolute", bottom: 24, width: "100%", alignItems: "center" }}>
-          <View style={{ width: "80%", justifyContent: "center" }}>
+        <View
+          style={{
+            position: "absolute",
+            bottom: 70,
+            width: "100%",
+            alignItems: "center",
+          }}
+        >
+          <View style={{ width: "80%" }}>
             <CustomButton
-              title="Start searching"
+              title="Start Searching"
               bgVariant="main"
               textVariant="primary"
               onPress={handlePress}

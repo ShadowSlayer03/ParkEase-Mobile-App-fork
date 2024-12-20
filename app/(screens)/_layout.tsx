@@ -1,13 +1,25 @@
-import { Tabs } from 'expo-router';
-import Svg, { Path } from 'react-native-svg';
-import { tablist, svgs } from '../../constants/tabConstants';
-import { Text } from 'react-native';
-import React from 'react';
+import React from "react";
+import { Text } from "react-native";
+import { Tabs } from "expo-router";
+import { tablist, svgs } from "../../constants/tabConstants";
+
+type TabName = "index" | "Profile" | "activity";
+
+interface TabItem {
+  name: TabName;
+  title: string;
+}
 
 export default function Layout() {
-  const getTabBarLabel = (focused, title) => {
+  const typedTablist = tablist as TabItem[];
+
+  const getTabBarLabel = (focused: boolean, title: string) => {
     return (
-      <Text className={`${focused ? "text-black" : "text-gray-400"} font-JakartaBold`}>
+      <Text
+        className={`${
+          focused ? "text-black" : "text-gray-400"
+        } font-FunnelDisplayBold`}
+      >
         {title}
       </Text>
     );
@@ -17,27 +29,25 @@ export default function Layout() {
     <Tabs
       screenOptions={{
         tabBarShowLabel: true,
-        tabBarIndicatorStyle: {
-          height: 4,
-          position: 'absolute',
-          top: 0,
-        },
         tabBarStyle: {
           height: 60,
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           borderTopWidth: 0,
+          marginBottom: 2
         },
       }}
     >
-      {tablist.map((item) => (
+      {typedTablist.map((item) => (
         <Tabs.Screen
           key={item.name}
           name={item.name}
           options={{
             headerShown: false,
             lazy: true, // Only load tabs when accessed
-            tabBarIcon: ({ focused }) => svgs[item.name](focused),
-            tabBarLabel: ({ focused }) => getTabBarLabel(focused, item.title),
+            tabBarIcon: ({ focused }) =>
+              svgs[item.name as TabName](focused), // Type assertion
+            tabBarLabel: ({ focused }) =>
+              getTabBarLabel(focused, item.title),
           }}
         />
       ))}

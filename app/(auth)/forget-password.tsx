@@ -1,21 +1,21 @@
-import * as React from 'react'
-import { TextInput, Button, View, Text, ScrollView } from 'react-native'
-import { useSignIn } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
+import * as React from "react";
+import { TextInput, Button, View, Text, ScrollView } from "react-native";
+import { useSignIn } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
-import { LinearGradient } from 'expo-linear-gradient';
-import AlertBanner from '@/components/Alert';
-import { alertStore } from '@/store/alertStore';
+import { LinearGradient } from "expo-linear-gradient";
+import AlertBanner from "@/components/Alert";
+import { alertStore } from "@/store/alertStore";
 
 export default function ForgotPasswordPage() {
-  const { isLoaded, signIn } = useSignIn()
-  const router = useRouter()
+  const { isLoaded, signIn } = useSignIn();
+  const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState(null)
-  const [password, setPassword] = React.useState(null)
-  const [code, setCode] = React.useState(null)
-  const [pendingVerification, setPendingVerification] = React.useState(false)
+  const [emailAddress, setEmailAddress] = React.useState<null | string>(null);
+  const [password, setPassword] = React.useState<null | string>(null);
+  const [code, setCode] = React.useState<null | string>(null);
+  const [pendingVerification, setPendingVerification] = React.useState(false);
 
   const { setStatusCode, setMsg, showAlert, setShowAlert } = alertStore();
 
@@ -30,12 +30,15 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      await signIn.create({ strategy: 'reset_password_email_code', identifier: emailAddress });
+      await signIn.create({
+        strategy: "reset_password_email_code",
+        identifier: emailAddress,
+      });
       setPendingVerification(true);
       setShowAlert();
       setStatusCode(200);
       setMsg("Password reset code sent to your email.");
-    } catch (err) {
+    } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       setStatusCode(422);
       setMsg(err?.errors[0]?.longMessage || "Error sending code.");
@@ -54,13 +57,17 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const result = await signIn.attemptFirstFactor({ strategy: 'reset_password_email_code', code, password });
-      if (result.status === 'complete') {
-        router.replace('(screens)');
+      const result = await signIn.attemptFirstFactor({
+        strategy: "reset_password_email_code",
+        code,
+        password,
+      });
+      if (result.status === "complete") {
+        router.replace("(screens)");
       } else {
         console.error(JSON.stringify(result, null, 2));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       setStatusCode(422);
       setMsg(err?.errors[0]?.longMessage || "Error resetting password.");
@@ -70,16 +77,18 @@ export default function ForgotPasswordPage() {
 
   return (
     <LinearGradient
-      colors={['#FFFFFF', '#FFD602']}
+      colors={["#FFFFFF", "#FFD602"]}
       start={{ x: 1, y: 0 }}
       end={{ x: 0, y: 1 }}
-      style={{ flex: 1 }}
+      style={{ flex: 1, paddingHorizontal: 5 }}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
         <View>
           {showAlert && <AlertBanner />}
           <View className="relative w-full mt-20 mb-10">
-            <Text className="text-2xl text-black text-center">Forgot Password?</Text>
+            <Text className="font-FunnelDisplayBold text-2xl text-black text-center">
+              Forgot Password?
+            </Text>
           </View>
           {!pendingVerification && (
             <View className="p-4">
@@ -88,13 +97,14 @@ export default function ForgotPasswordPage() {
                 placeholder="Enter email"
                 textContentType="emailAddress"
                 value={emailAddress}
-                onChangeText={(email) => setEmailAddress(email)}
+                onChangeText={(email: string) => setEmailAddress(email)}
               />
               <CustomButton
                 title="Send Code"
                 onPress={onSendCodePress}
                 className="mt-10"
-                bgVariant="brown"
+                bgVariant="dark"
+                textVariant="main"
               />
             </View>
           )}
@@ -106,7 +116,7 @@ export default function ForgotPasswordPage() {
                 placeholder="Enter reset code"
                 textContentType="oneTimeCode"
                 value={code}
-                onChangeText={(text) => setCode(text)}
+                onChangeText={(text: string) => setCode(text)}
               />
               <InputField
                 label="New Password"
@@ -114,7 +124,7 @@ export default function ForgotPasswordPage() {
                 secureTextEntry
                 textContentType="password"
                 value={password}
-                onChangeText={(text) => setPassword(text)}
+                onChangeText={(text: string) => setPassword(text)}
               />
               <CustomButton
                 title="Reset Password"
@@ -126,8 +136,12 @@ export default function ForgotPasswordPage() {
           )}
         </View>
         <View className="text-center mt-5">
-          <Link href="/sign-in" className="text-md text-general-200 text-center">
-            Remembered your password? <Text className="text-primary-500">Sign In</Text>
+          <Link
+            href="/sign-in"
+            className="font-FunnelSansSemiBold text-md text-general-200 text-center"
+          >
+            Remembered your password?{" "}
+            <Text className="text-primary-500">Sign In</Text>
           </Link>
         </View>
       </ScrollView>

@@ -1,34 +1,33 @@
-import { previousRides } from '@/assets/parkingareas/markers';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { previousRides } from "@/constants/parking-areas/markers";
+import React from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Activity = () => {
-    return (
-        <SafeAreaView>
-            <View>
-                <Text className="text-4xl font-JakartaBold p-5">Activity</Text>
+  return (
+    <SafeAreaView className="p-7 h-full bg-[#fcd904]">
+      <View className="mt-5">
+        <Text className="text-4xl font-FunnelDisplayBold">Activity</Text>
+      </View>
+      <ScrollView className="mt-12">
+        {previousRides.map((item, ind) => {
+          return (
+            <View key={ind} className="flex p-4 bg-black rounded-xl mb-5">
+              <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
+                From: {item.origin}
+              </Text>
+              <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
+                To: {item.destination}
+              </Text>
+              <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
+                Date: {item.time}
+              </Text>
             </View>
-            <View>
-                <View>
-                    <Text>Past</Text>
-                </View>
-                <View>
-                    {previousRides.map((item, ind)=>{
-                        return(
-                            <View key={ind} className="flex p-4 bg-primary-500 rounded-xl m-3">
-                                <Text className="text-white">From: {item.origin}</Text>
-                                <Text className="text-white">To: {item.destination}</Text>
-                                <Text className="text-white">Date: {item.time}</Text>
-                            </View>
-                        )
-                    })}
-                </View>
-            </View>
-        </SafeAreaView>
-    );
-}
-
-const styles = StyleSheet.create({})
+          );
+        })}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 export default Activity;

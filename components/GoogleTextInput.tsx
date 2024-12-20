@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import { GoogleInputProps } from "@/types/type";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { icons } from "@/constants";
@@ -11,23 +12,25 @@ const GoogleTextInput = ({
   textInputBackgroundColor,
   handlePress,
 }: GoogleInputProps) => {
-
   return (
     <View
-      className={`flex-1 bg-primary-500 rounded-full items-center justify-center ${containerStyle}`} // Ensure full flexbox layout
+      className={`flex-1 bg-primary-500 rounded-full items-center justify-center ${containerStyle}`}
     >
       <GooglePlacesAutocomplete
+        placeholder=""
         fetchDetails={true}
         debounce={200}
         styles={{
           textInputContainer: {
-            alignSelf: "center", // Align the input in the center of its parent
+            alignSelf: "center",
             borderRadius: 20,
           },
           textInput: {
             backgroundColor: "transparent",
+            color: "white",
             fontSize: 16,
             fontWeight: "600",
+            fontFamily: "Funnel-Display-Regular",
             height: 50,
             borderRadius: 25,
             paddingHorizontal: 20,
@@ -39,12 +42,8 @@ const GoogleTextInput = ({
             zIndex: 99,
           },
         }}
-        onPress={(data, details = null) => {
-          handlePress({
-            latitude: details?.geometry.location.lat!,
-            longitude: details?.geometry.location.lng!,
-            address: data.description,
-          });
+        onPress={() => {
+          handlePress();
         }}
         query={{
           key: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
@@ -52,13 +51,11 @@ const GoogleTextInput = ({
         }}
         renderLeftButton={() => (
           <View className="justify-center items-center px-4">
-              <TouchableOpacity
-                onPress={handlePress}
-              >
+            <TouchableOpacity onPress={handlePress}>
               <Image
                 source={icon ? icon : icons.close}
-                className="w-6 h-6"
-                resizeMode="contain"
+                className="w-4 h-4"
+                contentFit="contain"
               />
             </TouchableOpacity>
           </View>

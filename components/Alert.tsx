@@ -1,7 +1,8 @@
-import { alertStore } from '@/store/alertStore';
-import { useEffect } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import Animated, { SlideInLeft, FadeOut } from 'react-native-reanimated';
+import React, { useEffect } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import Animated, { SlideInLeft, FadeOut } from "react-native-reanimated";
+import { alertStore } from "@/store/alertStore";
+import { LinearGradient } from "expo-linear-gradient";
 
 const AlertBanner = () => {
   const { showAlert, message, statusCode, clearAll } = alertStore();
@@ -10,30 +11,57 @@ const AlertBanner = () => {
     clearAll();
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     const timer = setTimeout(() => {
-        clearAll();
-    }, 3000);
+      clearAll();
+    }, 5000);
 
-    return() =>  clearTimeout(timer);
-  })
-
-  console.log("Alert:", showAlert, message, statusCode);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!showAlert) return null;
 
   return (
-    <Animated.View 
-      entering={SlideInLeft.springify()}  // Slide in when alert appears
-      exiting={FadeOut.duration(300)}    // Fade out when alert is dismissed
-      className="absolute w-full bg-primary-500 z-50 top-10 flex-row items-center justify-between"
+    statusCode && <Animated.View
+      entering={SlideInLeft.springify()}
+      exiting={FadeOut.duration(300)}
+      className="absolute top-5 left-4 right-4 z-50 shadow-lg rounded-lg overflow-hidden"
     >
-      <Text className="font-bold text-white">
-        {statusCode}: {message}
-      </Text>
-      <TouchableOpacity onPress={closeBanner} className="m-4 p-4 bg-red-500">
-        <Text className="text-white">X</Text>
-      </TouchableOpacity>
+      <LinearGradient
+        colors={["#FFD602", "#FFC300"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          paddingVertical: 12,
+          paddingHorizontal: 10,
+          borderRadius: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: statusCode >= 400 ? "#FF0000" : "#00D26A",
+              marginRight: 10,
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              color: "#000000",
+              fontFamily: "Funnel-Sans-Medium",
+            }}
+          >
+            {statusCode}: {message}
+          </Text>
+        </View>
+      </LinearGradient>
     </Animated.View>
   );
 };

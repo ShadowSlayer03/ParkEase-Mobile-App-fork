@@ -1,101 +1,83 @@
-import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
-import * as Location from 'expo-location';
-import { markers } from '@/assets/parkingareas/markers';
-import { destStore } from '@/store/destStore';
-import { images } from '@/constants';
-import MapViewDirections from 'react-native-maps-directions';
-import { userLocationStore } from '@/store/userLocationStore';
+import React, { useEffect, useRef } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
+import * as Location from "expo-location";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import { icons } from "@/constants";
+import { markers } from "@/constants/parking-areas/markers";
+import { destStore } from "@/store/destStore";
+import destTypes from "@/types/destTypes";
+import AlertBanner from "./Alert";
+import { alertStore } from "@/store/alertStore";
+import { useRouter } from "expo-router";
+import useLocationAndProximity from "@/hooks/useLocationAndProximity";
+import focusMap from "@/utils/focusMap";
 
 export default function App() {
-  const mapRef = useRef();
-  const { destDetails, setDest, navigationStatus, showDestDetails } = destStore();
-  const { userLocation, setUserLocation } = userLocationStore();
-  const [heading, setHeading] = useState(0);
+  const mapRef = useRef<MapView>(null);
+  const { destDetails, setDest, navigationStatus, showDestDetails } =
+    destStore();
+  const { showAlert, setShowAlert, setStatusCode, setMsg } = alertStore();
+
+  const router = useRouter();
 
   const EXPO_PUBLIC_GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
-  //     useEffect(() => {
-  //       const getUserLocation = async () => {
-  //         try {
-  //             // Ensure location permissions are granted
-  //             const { status } = await Location.requestForegroundPermissionsAsync();
-  //             if (status !== 'granted') {
-  //                 Alert.alert('Permission not granted', 'Allow the app to use location services.');
-  //                 return;
-  //             }
 
-  //             // Watch the user's location continuously
-  //             Location.watchPositionAsync(
-  //                 {
-  //                     accuracy: Location.Accuracy.High,
-  //                     distanceInterval: 5,
-  //                     timeInterval: 3000, 
-  //                 },
-  //                 (location) => {
-  //                     console.log("User moved:", location.coords);
-  //                     setUserLocation(location.coords);
-  //                 },
-  //             );
-  //             Location.watchHeadingAsync(({trueHeading })=>{
-  //               setHeading(trueHeading );
-  //             })
-  //         } catch (error) {
-  //             console.error("Error fetching location:", error);
-  //         }
-  //     };
+  useEffect(() => {
+    if (!EXPO_PUBLIC_GOOGLE_API_KEY) {
+      setShowAlert();
+      setStatusCode(400);
+      setMsg("Google API Key Not Found!");
+    }
+  }, [EXPO_PUBLIC_GOOGLE_API_KEY]);
 
-  //     getUserLocation();
-
-  //     // Cleanup function to stop watching location on unmount
-  //     // return () => {
-  //     //     Location.stopObserving();
-  //     // };
-  // }, []);
-
-  const onMarkerSelected = (area) => {
+  const onMarkerSelected = (area: destTypes) => {
     setDest(area);
   };
 
-  const focusMap = async () => {
-    const location = await Location.getCurrentPositionAsync({});
-    const MyLocation = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    };
-
-    mapRef.current?.animateToRegion(MyLocation);
-  };
+  const { userLocation, heading } = useLocationAndProximity({
+    destination: destDetails,
+    onProximity: () => {
+      console.log("You have reached within 15 metres of the destination!");
+      router.push("(parking)/Parking");
+    },
+  });
 
   const INITIAL_REGION = {
-    latitude: 12.2958,
-    longitude: 76.6394,
+    latitude: 12.275869,
+    longitude: 76.643237,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   };
 
-
   return (
     <View className="relative h-full">
+      {showAlert && <AlertBanner />}
       <MapView
         className="h-full"
         style={styles.map}
         customMapStyle={mapStyle}
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_REGION}
-        showsMyLocationButton={false}
-        showsUserLocation={true}
+        showsMyLocationButton={true}
+        showsUserLocation={false}
+        zoomControlEnabled={true}
+        zoomEnabled={true}
         ref={mapRef}
       >
         {/* Custom User Location Marker */}
-        {userLocation && <Marker coordinate={userLocation}>
-          <View style={{ transform: [{ rotate: `${heading}deg` }] }}>
-            <Image style={{ transform: [{ rotate: "90deg" }] }} source={images.car_marker} className="h-6 w-6" />
-          </View>
-        </Marker>}
+        {userLocation && (
+          <Marker coordinate={userLocation}>
+            <View style={{ transform: [{ rotate: `${heading}deg` }] }}>
+              <Image
+                style={{ transform: [{ rotate: "90deg" }] }}
+                source={icons.car_marker}
+                className="h-6 w-6"
+              />
+            </View>
+          </Marker>
+        )}
         {markers?.map((area, ind) => {
           return (
             <Marker
@@ -108,27 +90,28 @@ export default function App() {
             >
               <View className="">
                 <Image
-                  source={images.marker_icon}
+                  source={icons.marker_icon}
                   className="w-9 h-9 rounded-full"
                 />
               </View>
             </Marker>
-          )
+          );
         })}
-        {userLocation && destDetails && navigationStatus &&
+        {userLocation && destDetails && navigationStatus && (
           <MapViewDirections
             origin={userLocation}
             destination={destDetails}
             apikey={EXPO_PUBLIC_GOOGLE_API_KEY}
-            strokeWidth={4}  // Set line thickness
-            strokeColor="#FFD602"
+            strokeWidth={2}
+            strokeColor="rgba(255, 214, 2, 0.8)"
           />
-        }
+        )}
       </MapView>
-      <TouchableOpacity className="absolute z-20 bottom-1/3 right-5" onPress={focusMap}>
-        <Svg width={30} height={30} fill="#f3f3f3" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#3f3f3f" className="size-6">
-          <Path strokeLinecap="round" strokeLinejoin="round" d="M7.5 3.75H6A2.25 2.25 0 0 0 3.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0 1 20.25 6v1.5m0 9V18A2.25 2.25 0 0 1 18 20.25h-1.5m-9 0H6A2.25 2.25 0 0 1 3.75 18v-1.5M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </Svg>
+      <TouchableOpacity
+        className="absolute z-20 bottom-32 right-5"
+        onPress={() => focusMap(mapRef)}
+      >
+        <Image className="h-6 w-6" source={icons.my_location_icon} />
       </TouchableOpacity>
     </View>
   );
@@ -141,94 +124,71 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
 });
 
 const mapStyle = [
   {
     elementType: "geometry",
-    stylers: [
-      { color: "#1e1e1e" } // Dark background color
-    ],
+    stylers: [{ color: "#1e1e1e" }],
   },
   {
     elementType: "labels.icon",
-    stylers: [
-      { visibility: "off" } // Hide icons
-    ],
+    stylers: [{ visibility: "on" }],
   },
   {
     elementType: "labels.text.fill",
-    stylers: [
-      { color: "#525252" } // Dim gray for text labels
-    ],
+    stylers: [{ color: "#525252" }],
   },
   {
     elementType: "labels.text.stroke",
-    stylers: [
-      { color: "#1e1e1e" } // Match background color for minimal text visibility
-    ],
+    stylers: [{ color: "#1e1e1e" }],
   },
   {
     featureType: "administrative",
     elementType: "geometry",
-    stylers: [
-      { color: "#525252" } // Slightly visible borders
-    ],
+    stylers: [{ color: "#525252" }],
   },
   {
     featureType: "poi",
     elementType: "labels",
-    stylers: [
-      { visibility: "off" } // Hide POI labels
-    ],
+    stylers: [{ visibility: "off" }],
   },
   {
     featureType: "poi.park",
     elementType: "geometry",
-    stylers: [
-      { color: "#191919" } // Darker shade for parks
-    ],
+    stylers: [{ color: "#191919" }],
   },
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [
-      { color: "#2c2c2c" } // Dark gray for roads
-    ],
+    stylers: [{ visibility: "simplified" }, { color: "#2c2c2c" }],
   },
   {
     featureType: "road.arterial",
     elementType: "geometry",
-    stylers: [
-      { color: "#2b2b2b" } // Slightly lighter for arterial roads
-    ],
+    stylers: [{ color: "#2b2b2b" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [
-      { color: "#333333" } // A bit lighter for highways
-    ],
+    stylers: [{ color: "#333333" }],
   },
   {
     featureType: "road.local",
     elementType: "geometry",
-    stylers: [
-      { color: "#282828" } // Slightly darker for local roads
-    ],
+    stylers: [{ color: "#282828" }],
   },
   {
     featureType: "transit",
     elementType: "geometry",
-    stylers: [
-      { color: "#1a1a1a" } // Dark transit lines
-    ],
+    stylers: [{ color: "#1a1a1a" }],
   },
   {
     featureType: "water",
     elementType: "geometry",
-    stylers: [
-      { color: "#0e0e0e" } // Very dark color for water
-    ],
-  }
+    stylers: [{ color: "#0e0e0e" }],
+  },
 ];

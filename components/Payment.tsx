@@ -142,14 +142,14 @@ const Payment = ({
         <View className="flex flex-col items-center justify-center bg-white p-7 rounded-2xl">
           <Image source={images.check} className="w-28 h-28 mt-5" />
 
-          <Text className="text-2xl text-center font-JakartaBold mt-5">
+          <Text className="text-2xl text-center font-FunnelDisplayBold mt-5">
             Booking placed successfully
           </Text>
 
-          <Text className="text-md text-general-200 font-JakartaMedium text-center mt-3">
+          <Text className="text-md text-general-200 font-FunnelDisplayMedium text-center mt-3">
             Thank you for your booking.
           </Text>
-          <Text className="text-md text-general-200 font-JakartaMedium text-center">
+          <Text className="text-md text-general-200 font-FunnelDisplayMedium text-center">
             Your reservation has been successfully placed. Please proceed with your trip.
           </Text>
 

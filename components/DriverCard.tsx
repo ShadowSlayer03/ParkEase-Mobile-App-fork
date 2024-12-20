@@ -20,35 +20,35 @@ const DriverCard = ({ item, selected, setSelected }: DriverCardProps) => {
 
       <View className="flex-1 flex flex-col items-start justify-center mx-3">
         <View className="flex flex-row items-center justify-start mb-1">
-          <Text className="text-lg font-JakartaMedium">{item.title}</Text>
+          <Text className="text-lg font-FunnelDisplayMedium">{item.title}</Text>
 
           <View className="flex flex-row items-center space-x-1 ml-2">
             <Image source={icons.star} className="w-3.5 h-3.5" />
-            <Text className="text-sm font-JakartaMedium">{item.rating}</Text>
+            <Text className="text-sm font-FunnelDisplayMedium">{item.rating}</Text>
           </View>
         </View>
 
         <View className="flex flex-row items-center justify-start">
           <View className="flex flex-row items-center">
             <Image source={icons.dollar} className="w-4 h-4" />
-            <Text className="text-sm font-JakartaMedium ml-1">
+            <Text className="text-sm font-FunnelDisplayMedium ml-1">
               ${item.price}
             </Text>
           </View>
 
-          <Text className="text-sm font-JakartaMedium text-general-800 mx-1">
+          <Text className="text-sm font-FunnelDisplayMedium text-general-800 mx-1">
             |
           </Text>
 
-          <Text className="text-sm font-JakartaMedium text-general-800">
+          <Text className="text-sm font-FunnelDisplayMedium text-general-800">
             {formatTime(parseInt(`${item.time}`!) || 5)}
           </Text>
 
-          <Text className="text-sm font-JakartaMedium text-general-800 mx-1">
+          <Text className="text-sm font-FunnelDisplayMedium text-general-800 mx-1">
             |
           </Text>
 
-          <Text className="text-sm font-JakartaMedium text-general-800">
+          <Text className="text-sm font-FunnelDisplayMedium text-general-800">
             {item.car_seats} seats
           </Text>
         </View>

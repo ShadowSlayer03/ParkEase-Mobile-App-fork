@@ -4,13 +4,19 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        Jakarta: ["Jakarta-Regular", "sans-serif"],
-        JakartaBold: ["Jakarta-Bold", "sans-serif"],
-        JakartaExtraBold: ["Jakarta-ExtraBold", "sans-serif"],
-        JakartaExtraLight: ["Jakarta-ExtraLight", "sans-serif"],
-        JakartaLight: ["Jakarta-Light", "sans-serif"],
-        JakartaMedium: ["Jakarta-Medium", "sans-serif"],
-        JakartaSemiBold: ["Jakarta-SemiBold", "sans-serif"],
+        FunnelSans: ["Funnel-Sans-Regular", "sans-serif"],
+        FunnelSansBold: ["Funnel-Sans-Bold", "sans-serif"],
+        FunnelSansExtraBold: ["Funnel-Sans-ExtraBold", "sans-serif"],
+        FunnelSansLight: ["Funnel-Sans-Light", "sans-serif"],
+        FunnelSansMedium: ["Funnel-Sans-Medium", "sans-serif"],
+        FunnelSansSemiBold: ["Funnel-Sans-SemiBold", "sans-serif"],
+
+        FunnelDisplay: ["Funnel-Display-Regular", "sans-serif"],
+        FunnelDisplayBold: ["Funnel-Display-Bold", "sans-serif"],
+        FunnelDisplayExtraBold: ["Funnel-Display-ExtraBold", "sans-serif"],
+        FunnelDisplayLight: ["Funnel-Display-Light", "sans-serif"],
+        FunnelDisplayMedium: ["Funnel-Display-Medium", "sans-serif"],
+        FunnelDisplaySemiBold: ["Funnel-Display-SemiBold", "sans-serif"],
       },
       colors: {
         primary: {
