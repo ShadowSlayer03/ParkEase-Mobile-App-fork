@@ -61,13 +61,13 @@ export default function App() {
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_REGION}
         showsMyLocationButton={true}
-        showsUserLocation={false}
+        showsUserLocation={true}
         zoomControlEnabled={true}
         zoomEnabled={true}
         ref={mapRef}
       >
         {/* Custom User Location Marker */}
-        {userLocation && (
+        {/* {userLocation && (
           <Marker coordinate={userLocation}>
             <View style={{ transform: [{ rotate: `${heading}deg` }] }}>
               <Image
@@ -77,7 +77,7 @@ export default function App() {
               />
             </View>
           </Marker>
-        )}
+        )} */}
         {markers?.map((area, ind) => {
           return (
             <Marker
