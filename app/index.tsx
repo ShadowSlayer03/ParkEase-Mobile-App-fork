@@ -1,27 +1,21 @@
-import React from "react";
-import { useFonts } from "expo-font";
-import { SplashScreen, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, Alert } from "react-native";
 import { Image } from "expo-image";
 import "react-native-get-random-values";
-import CustomButton from "@/components/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFonts } from "expo-font";
+import { SplashScreen, useRouter } from "expo-router";
+import CustomButton from "@/components/CustomButton";
 import { images } from "@/constants";
 import { useUser } from "@clerk/clerk-expo";
+import axios from "axios";
 
 export default function Index() {
-  const [errorMsg, setErrorMsg] = useState("");
+  const [data, setData] = useState<any>(null); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { isSignedIn } = useUser();
   const router = useRouter();
-
-  const handlePress = () => {
-    if (!isSignedIn) {
-      router.push("(auth)/welcome");
-    } else {
-      router.push("(screens)");
-    }
-  };
 
   const [loaded] = useFonts({
     "Funnel-Sans-Bold": require("../assets/fonts/FunnelSans-Bold.ttf"),
@@ -44,6 +38,34 @@ export default function Index() {
       SplashScreen.hideAsync().catch(console.warn);
     }
   }, [loaded]);
+
+  // Async function to fetch data
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("http://localhost:3000/api/parking-lots");
+      console.log("Response:", response);
+  
+      setData(response.data); // Axios automatically parses the response as JSON
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+      Alert.alert("Error", "Failed to load data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Call fetchData on component mount
+  }, []);
+
+  const handlePress = () => {
+    if (!isSignedIn) {
+      router.push("(auth)/welcome");
+    } else {
+      router.push("(screens)");
+    }
+  };
 
   if (!loaded) {
     return null;

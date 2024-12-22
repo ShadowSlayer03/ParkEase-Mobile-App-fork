@@ -26,8 +26,8 @@ const LocationDetails = () => {
     },
   };
 
-  const { data, isLoading, error } = useApi("http://localhost:3000/locationDetails");
-  console.log("Result obtained:",data);
+  // const { data, isLoading, error } = useApi("http://localhost:3000/locationDetails");
+  // console.log("Result obtained:",data);
 
   return (
     <Animated.View
