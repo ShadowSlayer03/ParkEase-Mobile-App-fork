@@ -1,13 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { images } from "@/constants";
 import Svg, { Path } from "react-native-svg";
 import { parkingDataStore } from "@/store/parkingDataStore";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import axios from "axios";
 
 const ParkingArea = () => {
-  const { spotsInfo, parkingSpotName, filled, total } = parkingDataStore();
+  // const { spotsInfo, parkingLotName, filled, total } = parkingDataStore();
+  const [spotsInfo, setSpotsInfo] = useState();
+  const [parkingLotName, setParkingLotName] = useState();
+  const [filled, setFilled] = useState();
+  const [total, setTotal] = useState();
+  useEffect(()=>{
+    const interval = setInterval(() => {
+      fetchData();
+    }, 1000);
 
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  },[]);
+  const fillTheDetails = (data) => {
+    if (!data) return; // Handle undefined or null data
+  
+    setParkingLotName(data?.name);
+    setTotal(data?.totalSlots);
+  
+    const newArr = Array(data?.totalSlots || 0).fill(0); // Create array based on data.totalSlots
+    data?.slots.forEach((slot, ind) => {
+      if (slot.status) {
+        newArr[ind] = 1;
+      }
+    });
+  
+    setSpotsInfo(newArr); // Update state with the new array
+  };
+  
+  const fetchData = async ()=>{
+    try {
+      const response = await axios.get('http://192.168.22.19:3000/api/parking-lots');
+  
+      // const data = await response.json();
+      console.log(response.data);
+      fillTheDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching parking lot data:', error);
+    }
+  }
   return (
     <View>
       <View className="flex flex-row p-2 justify-between">
@@ -35,7 +74,7 @@ const ParkingArea = () => {
           <View>
             <Text className="text-white font-FunnelDisplayBold">Location</Text>
             <Text className="text-white text-xl font-FunnelDisplayMedium">
-              {parkingSpotName}
+              {parkingLotName}
             </Text>
           </View>
         </View>
