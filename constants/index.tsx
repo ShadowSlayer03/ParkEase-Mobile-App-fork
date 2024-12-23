@@ -17,7 +17,7 @@ import map_parkease from "@/assets/images/map_parkease.png";
 import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
-import car_top_view from "@/assets/images/car_top_view.jpeg"
+import car_top_view from "@/assets/images/car_top_view.png"
 import parking_slot from "@/assets/images/parking_slot.jpeg"
 import dotted_lines from "@/assets/images/dotted_lines.jpeg"
 

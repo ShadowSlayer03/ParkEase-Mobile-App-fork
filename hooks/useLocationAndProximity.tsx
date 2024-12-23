@@ -110,8 +110,7 @@ function useLocationAndProximity({
   const { navigationStatus } = destStore();
   const [heading, setHeading] = useState(0);
 
-  // Boundary definition
-  const boundaries : Record<string, [number, number][]> = {
+  const boundaries: Record<string, [number, number][]> = {
     "NIE Admin": [
       [12.283582199560623, 76.64153444198031],
       [12.28398865275799, 76.64175961942637],
@@ -124,7 +123,7 @@ function useLocationAndProximity({
       [12.281352292361422, 76.64107151927576],
       [12.280782298270891, 76.6410343833564],
     ],
-    "TruLit Herbals":[
+    "Tru Lit Herbals": [
       [12.27596784244327, 76.64320259367528],
       [12.275950705027416, 76.64336718514464],
       [12.275842607455598, 76.64319854634407],
@@ -132,24 +131,22 @@ function useLocationAndProximity({
     ]
   };
 
-  // utils/insidePolygon.ts
-const insidePolygon = (point: [number, number], polygon: [number, number][]) => {
-  const [px, py] = point;
-  let isInside = false;
+  const insidePolygon = (point: [number, number], polygon: [number, number][]) => {
+    const [px, py] = point;
+    let isInside = false;
 
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const [xi, yi] = polygon[i];
-    const [xj, yj] = polygon[j];
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const [xi, yi] = polygon[i];
+      const [xj, yj] = polygon[j];
 
-    const intersect =
-      yi > py !== yj > py &&
-      px < ((xj - xi) * (py - yi)) / (yj - yi) + xi;
-    if (intersect) isInside = !isInside;
-  }
+      const intersect =
+        yi > py !== yj > py &&
+        px < ((xj - xi) * (py - yi)) / (yj - yi) + xi;
+      if (intersect) isInside = !isInside;
+    }
 
-  return isInside;
-};
-
+    return isInside;
+  };
 
   useEffect(() => {
     const startTracking = async () => {

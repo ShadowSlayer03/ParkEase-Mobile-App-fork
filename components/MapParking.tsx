@@ -68,7 +68,7 @@ export default function App() {
     destination: destDetails,
     onProximity: () => {
       console.log("You have reached within 15 metres of the destination!");
-      router.push("(parking)/Parking");
+      router.push("(parking)");
     },
   });
 

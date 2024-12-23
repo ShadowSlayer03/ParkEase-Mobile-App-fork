@@ -12,7 +12,7 @@ export const markers = [
 	{
 		latitude: 12.275942, 
 		longitude: 76.643299,
-		name: "TruLit Herbals"
+		name: "Tru Lit Herbals"
 	}
 ];
 
