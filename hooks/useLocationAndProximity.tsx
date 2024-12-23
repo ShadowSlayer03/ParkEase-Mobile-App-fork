@@ -89,9 +89,10 @@ import { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { userLocationStore } from "@/store/userLocationStore";
 import { destStore } from "@/store/destStore";
+import destTypes from "@/types/destTypes";
 
 interface UseLocationAndProximityOptions {
-  destination?: string | null; // Destination name
+  destination?: destTypes | null; // Destination name
   onProximity?: () => void;
 }
 
@@ -110,14 +111,14 @@ function useLocationAndProximity({
   const [heading, setHeading] = useState(0);
 
   // Boundary definition
-  const boundaries = {
+  const boundaries : Record<string, [number, number][]> = {
     "NIE Admin": [
       [12.283582199560623, 76.64153444198031],
       [12.28398865275799, 76.64175961942637],
       [12.28427249715797, 76.64140795830838],
       [12.283629451615901, 76.64106288036548],
     ],
-    GJB: [
+    "GJB": [
       [12.281633509157041, 76.64071099139541],
       [12.28089871626085, 76.64042783001264],
       [12.281352292361422, 76.64107151927576],
@@ -172,7 +173,7 @@ const insidePolygon = (point: [number, number], polygon: [number, number][]) => 
 
             // Check if user is within the boundary of the destination
             if (destination && onProximity) {
-              const boundary = boundaries[destination];
+              const boundary = boundaries[destination.name];
               if (boundary && insidePolygon([latitude, longitude], boundary)) {
                 onProximity();
               }

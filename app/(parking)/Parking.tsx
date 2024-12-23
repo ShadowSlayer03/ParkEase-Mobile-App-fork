@@ -37,8 +37,12 @@ const ParkingArea = () => {
   };
   
   const fetchData = async ()=>{
+    const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+    if(!backendURL) console.error("Could not get BACKEND_URL from .env");
+
     try {
-      const response = await axios.get('http://192.168.22.19:3000/api/parking-lots');
+      const response = await axios.get(`${backendURL}/api/parking-lots`);
   
       // const data = await response.json();
       console.log(response.data);
@@ -88,7 +92,7 @@ const ParkingArea = () => {
         </View>
       </View>
       <ScrollView className="p-1">
-        {spotsInfo.map((data, ind) => {
+        {spotsInfo?.map((data, ind) => {
           return (
             <View className="flex flex-row w-full" key={ind}>
               <View className="w-3/5">
