@@ -2,6 +2,7 @@
   "expo": {
     "name": "ParkEase",
     "slug": "ParkEase",
+    "output": "server",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon_parkease.png",
@@ -30,7 +31,6 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -40,7 +40,12 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": "http://localhost:8081"
+        }
+      ],
       "expo-secure-store",
       "expo-font"
     ],

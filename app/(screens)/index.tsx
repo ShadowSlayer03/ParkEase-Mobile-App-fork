@@ -9,14 +9,18 @@ import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { Text, TouchableOpacity, View, BackHandler, Alert } from "react-native";
 import { Path, Svg } from "react-native-svg";
+import axios from 'axios'
+import { userLocationStore } from "@/store/userLocationStore";
 
 const Map = () => {
   const { showDestDetails, setShowDestDetails, setDest } = destStore();
   const [showFilter, setShowFilter] = useState(false);
   const [googleSearch, setGoogleSearch] = useState(false);
+  const [numSlotsNearMe, setNumSlotsNearMe] = useState(0);
 
   const [showList, setShowList] = useState(false);
   const router = useRouter();
+  const { userLocation } = userLocationStore();
 
   const { isSignedIn } = useUser();
   if (!isSignedIn) {
@@ -79,6 +83,33 @@ const Map = () => {
     };
   }, [showFilter, googleSearch]);
 
+  const fetchNumberOfSlotsNearMe = async () => {
+    const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+    if(!backendURL) console.error("Could not get BACKEND_URL from .env");
+
+    try {
+      const response = await axios.post(`${backendURL}/api/nearby-parking-lots`, {
+        userLat: userLocation?.latitude,
+        userLon: userLocation?.longitude
+      })
+
+      const num = response.data.length;
+      console.log('Response from fetchNumberOfSlotsNearMe:',num);
+
+      setNumSlotsNearMe(num)
+
+    } catch (error: any) {
+      console.error('Error fetching the number of slots near me:', error.message)
+    }
+  }
+
+  useEffect(() => {
+    //fetchParkingLots();
+    if (userLocation)
+      fetchNumberOfSlotsNearMe()
+  }, []);
+
   return (
     <View className="relative h-full bg-black">
       <MapParking />
@@ -98,7 +129,7 @@ const Map = () => {
               <View className="bg-primary-700 rounded-3xl flex flex-row justify-center items-center">
                 <View className="h-9 w-9 flex justify-center items-center bg-[#fcd904] rounded-3xl">
                   <Text className="text-xl text-black font-FunnelSans">
-                    2
+                    {numSlotsNearMe || 0}
                   </Text>
                 </View>
 

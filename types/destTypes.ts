@@ -1,7 +1,7 @@
 type destTypes = {
   latitude: number;
   longitude: number;
-  name: string
+  name: string;
 };
 
 export default destTypes;

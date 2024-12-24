@@ -1,29 +1,58 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import CustomButton from "./CustomButton";
 import NavigationArrow from "./NavigationArrow";
 import { TouchableOpacity } from "react-native";
 import { destStore } from "@/store/destStore";
 import Animated, { SlideInDown } from "react-native-reanimated";
+import { userLocationStore } from "@/store/userLocationStore";
+import axios from "axios";
+
+interface LocationDetails {
+  parkingLotName: string;
+  latitude: number,
+  longitude: number,
+  distance: number,
+  totalSlots: number,
+  availableSlots: number,
+  filledSlots: number,
+};
 
 const LocationDetails = () => {
   const { destDetails, clearDest, setNavigationStatus } = destStore();
+  const { userLocation } = userLocationStore();
+  const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
 
   const navigateToDest = () => {
     setNavigationStatus(true);
   };
 
-  const locationDetails = {
-    name: "NIE-Admin Block",
-    location: "Manandvadi road, NIE",
-    list_details: {
-      distance: 2100,
-      spots_left: 2,
-      no_of_slots: 20,
-      filled: 18,
-    },
-  };
+  const fetchLocationDetails = async () => {
+    const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+    if (!backendURL) console.error("Could not get BACKEND_URL from .env");
+
+    try {
+      const response = await axios.post(`${backendURL}/api/lot-details`,{
+        parkingLotName: destDetails?.name,
+        userLat: userLocation?.latitude,
+        userLon: userLocation?.longitude
+      });
+
+      console.log("Response from fetchLocationDetails:", response.data);
+
+      setLocationDetails(response.data);
+
+    } catch (error: any) {
+      console.error("Error occurred while getting location details:", error)
+    }
+  }
+
+  useEffect(() => {
+    if (userLocation)
+      fetchLocationDetails();
+  }, [])
 
   return (
     <Animated.View
@@ -54,11 +83,11 @@ const LocationDetails = () => {
       </View>
       <View className="mt-5 mx-2">
         <Text className="text-xl font-FunnelDisplayBold">
-          {destDetails?.name}
+          {locationDetails?.parkingLotName}
         </Text>
         <Text className="text-base font-FunnelDisplayMedium">
-          Coordinates: {destDetails?.latitude.toFixed(4)},{" "}
-          {destDetails?.longitude.toFixed(4)}
+          Coordinates: {locationDetails?.latitude.toFixed(4)},{" "}
+          {locationDetails?.longitude.toFixed(4)}
         </Text>
       </View>
       <ScrollView
@@ -67,14 +96,17 @@ const LocationDetails = () => {
         showsHorizontalScrollIndicator={false}
       >
         <View className="flex flex-row gap-3 py-4">
-          <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails.list_details.no_of_slots} spots present
+          <Text className="text-base font-FunnelDisplayMedium py-1 px-2 rounded-full bg-primary-200">
+            {locationDetails?.distance} km
           </Text>
           <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails.list_details.filled} spots filled
+            {locationDetails?.totalSlots} spots present
           </Text>
           <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails.list_details.spots_left} spots available
+            {locationDetails?.filledSlots} spots filled
+          </Text>
+          <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
+            {locationDetails?.availableSlots} spots available
           </Text>
         </View>
       </ScrollView>

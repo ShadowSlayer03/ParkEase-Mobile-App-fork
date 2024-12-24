@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Image } from "expo-image";
-import * as Location from "expo-location";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
+import * as Location from "expo-location"
 import { icons } from "@/constants";
 import { markers } from "@/constants/parking-areas/markers";
 import { destStore } from "@/store/destStore";
@@ -25,12 +25,40 @@ export default function App() {
   const EXPO_PUBLIC_GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
   useEffect(() => {
+    if (markers) console.log("Markers are loaded successfully!")
+  }, [markers])
+
+  useEffect(() => {
     if (!EXPO_PUBLIC_GOOGLE_API_KEY) {
       setShowAlert();
       setStatusCode(400);
       setMsg("Google API Key Not Found!");
     }
   }, [EXPO_PUBLIC_GOOGLE_API_KEY]);
+
+  useEffect(() => {
+    const getLocationPermissions = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+
+        if (status !== "granted") {
+          setShowAlert();
+          setStatusCode(401);
+          setMsg("Location Permission Denied");
+          return;
+        }
+
+      } catch (error) {
+        console.error("Error while requesting location permissions:", error);
+        setShowAlert();
+        setStatusCode(500);
+        setMsg("Failed to request location permissions");
+      }
+    };
+
+    getLocationPermissions();
+
+  }, []);
 
   const onMarkerSelected = (area: destTypes) => {
     setDest(area);
@@ -40,7 +68,7 @@ export default function App() {
     destination: destDetails,
     onProximity: () => {
       console.log("You have reached within 15 metres of the destination!");
-      router.push("(parking)/Parking");
+      router.push("(parking)");
     },
   });
 
@@ -53,14 +81,14 @@ export default function App() {
 
   return (
     <View className="relative h-full">
-      {showAlert && <AlertBanner />}
+
       <MapView
         className="h-full"
         style={styles.map}
         customMapStyle={mapStyle}
         provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_REGION}
-        showsMyLocationButton={true}
+        showsMyLocationButton={false}
         showsUserLocation={true}
         zoomControlEnabled={true}
         zoomEnabled={true}
@@ -78,23 +106,24 @@ export default function App() {
             </View>
           </Marker>
         )} */}
-        {markers?.map((area, ind) => {
+        {markers.map((area, ind) => {
           return (
-            <Marker
-              key={ind}
-              coordinate={{
-                latitude: area.latitude,
-                longitude: area.longitude,
-              }}
-              onPress={() => onMarkerSelected(area)}
-            >
-              <View className="">
-                <Image
-                  source={icons.marker_icon}
-                  className="w-9 h-9 rounded-full"
-                />
-              </View>
-            </Marker>
+            <View key={ind}>
+              <Marker
+                coordinate={{
+                  latitude: area.latitude,
+                  longitude: area.longitude,
+                }}
+                onPress={() => onMarkerSelected(area)}
+              >
+                <View>
+                  <Image
+                    source={icons.marker_icon}
+                    className="w-9 h-9 rounded-full"
+                  />
+                </View>
+              </Marker>
+            </View>
           );
         })}
         {userLocation && destDetails && navigationStatus && (
@@ -108,11 +137,13 @@ export default function App() {
         )}
       </MapView>
       <TouchableOpacity
-        className="absolute z-20 bottom-32 right-5"
+        className="absolute z-50 bottom-32 right-5"
+        style={{ zIndex: 50 }}
         onPress={() => focusMap(mapRef)}
       >
         <Image className="h-6 w-6" source={icons.my_location_icon} />
       </TouchableOpacity>
+      {showAlert && <AlertBanner />}
     </View>
   );
 }
