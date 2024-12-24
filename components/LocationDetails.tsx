@@ -6,7 +6,6 @@ import NavigationArrow from "./NavigationArrow";
 import { TouchableOpacity } from "react-native";
 import { destStore } from "@/store/destStore";
 import Animated, { SlideInDown } from "react-native-reanimated";
-import useApi from "@/hooks/useApi";
 
 const LocationDetails = () => {
   const { destDetails, clearDest, setNavigationStatus } = destStore();
@@ -25,9 +24,6 @@ const LocationDetails = () => {
       filled: 18,
     },
   };
-
-  // const { data, isLoading, error } = useApi("http://localhost:3000/locationDetails");
-  // console.log("Result obtained:",data);
 
   return (
     <Animated.View
