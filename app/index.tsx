@@ -5,7 +5,6 @@ import { Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useUser } from "@clerk/clerk-expo";
 import CustomButton from "@/components/CustomButton";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/constants";
 import { getUserLocation } from "@/utils/getUserLocation";
 import { userLocationStore } from "@/store/userLocationStore";
@@ -14,14 +13,6 @@ export default function Index() {
   const { isSignedIn } = useUser();
   const { setUserLocation } = userLocationStore();
   const router = useRouter();
-
-  const handlePress = () => {
-    if (!isSignedIn) {
-      router.push("(auth)/welcome");
-    } else {
-      router.push("(screens)");
-    }
-  };
 
   const [loaded] = useFonts({
     "Funnel-Sans-Bold": require("../assets/fonts/FunnelSans-Bold.ttf"),
@@ -44,6 +35,34 @@ export default function Index() {
       fetchLocation()
     }
   }, [loaded]);
+
+  // Async function to fetch data
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("http://localhost:3000/api/parking-lots");
+      console.log("Response:", response);
+  
+      setData(response.data); // Axios automatically parses the response as JSON
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+      Alert.alert("Error", "Failed to load data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Call fetchData on component mount
+  }, []);
+
+  const handlePress = () => {
+    if (!isSignedIn) {
+      router.push("(auth)/welcome");
+    } else {
+      router.push("(screens)");
+    }
+  };
 
   if (!loaded) {
     return null;
