@@ -5,7 +5,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location"
 import { icons } from "@/constants";
-import { markers } from "@/constants/parking-areas/markers";
+//import { markers } from "@/constants/parking-areas/markers";
 import { destStore } from "@/store/destStore";
 import destTypes from "@/types/destTypes";
 import AlertBanner from "./Alert";
@@ -13,8 +13,13 @@ import { alertStore } from "@/store/alertStore";
 import { useRouter } from "expo-router";
 import useLocationAndProximity from "@/hooks/useLocationAndProximity";
 import focusMap from "@/utils/focusMap";
+import TransformedData from "@/types/transformedData";
 
-export default function App() {
+interface AppProps {
+  markers: TransformedData[] | null;
+}
+
+export default function App({markers}:AppProps) {
   const mapRef = useRef<MapView>(null);
   const { destDetails, setDest, navigationStatus, showDestDetails } =
     destStore();
@@ -67,8 +72,9 @@ export default function App() {
   const { userLocation, heading } = useLocationAndProximity({
     destination: destDetails,
     onProximity: () => {
-      console.log("You have reached within 15 metres of the destination!");
+      console.log("You have reached the destination!");
       router.push("(parking)");
+      return;
     },
   });
 
@@ -93,6 +99,12 @@ export default function App() {
         zoomControlEnabled={true}
         zoomEnabled={true}
         ref={mapRef}
+        loadingEnabled = {true}
+        loadingIndicatorColor="#666666"
+        loadingBackgroundColor="#eeeeee"
+        moveOnMarkerPress = {false}
+        showsCompass={true}
+        showsPointsOfInterest = {false}
       >
         {/* Custom User Location Marker */}
         {/* {userLocation && (
@@ -106,7 +118,7 @@ export default function App() {
             </View>
           </Marker>
         )} */}
-        {markers.map((area, ind) => {
+        {markers?.map((area, ind) => {
           return (
             <View key={ind}>
               <Marker
@@ -137,8 +149,7 @@ export default function App() {
         )}
       </MapView>
       <TouchableOpacity
-        className="absolute z-50 bottom-32 right-5"
-        style={{ zIndex: 50 }}
+        className="absolute z-20 bottom-32 right-5"
         onPress={() => focusMap(mapRef)}
       >
         <Image className="h-6 w-6" source={icons.my_location_icon} />

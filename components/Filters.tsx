@@ -25,7 +25,11 @@ import Slider from "@react-native-community/slider";
 import { filterStore } from "@/store/filterStore";
 import CustomButton from "./CustomButton";
 
-const Filters = ({ setShowFilter }) => {
+interface FiltersProps {
+  setShowFilter: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Filters = ({ setShowFilter }:FiltersProps) => {
   const [isEnabled, setIsEnabld] = useState(false);
   const [distanceMetric, setDitanceMetric] = useState("km");
   const [isSliderActive, setIsSliderActive] = useState(false);
@@ -88,7 +92,7 @@ const Filters = ({ setShowFilter }) => {
           <Text className="w-screen border-t h-1 border-primary-500"></Text>
           <View className="mx-2">
             <View className="flex flex-row justify-between">
-              <Text className="font-FunnelSansBold px-2 py-4 text-white">
+              <Text className="font-FunnelDisplayMedium px-2 py-4 text-white">
                 Show only free parking spots
               </Text>
               <Switch
@@ -99,7 +103,7 @@ const Filters = ({ setShowFilter }) => {
               />
             </View>
             <View className="flex flex-row py-3 justify-between">
-              <Text className="p-2 text-white font-FunnelSansMedium">Distance</Text>
+              <Text className="p-2 text-white font-FunnelDisplayMedium">Distance</Text>
               <View className="flex flex-row gap-4">
                 <Text className="p-2 text-white">
                   {Math.ceil(distanceRange)}

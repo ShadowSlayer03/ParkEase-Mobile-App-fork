@@ -1,6 +1,16 @@
 import { create } from "zustand";
 
-export const filterStore = create((set) => ({
+interface FilterStore {
+  showOnlyFreeSpots: boolean;
+  parkingType: number[];
+  distanceRange: number;
+  setShowOnlyFreeSpots: () => void;
+  setParkingType: (type: number[]) => void;
+  setDistanceRange: (dist: number) => void;
+  clearAll: () => void;
+}
+
+export const filterStore = create<FilterStore>((set) => ({
   showOnlyFreeSpots: false,
   parkingType: [0, 1],
   distanceRange: 2,
@@ -12,7 +22,6 @@ export const filterStore = create((set) => ({
     set(() => ({
       showOnlyFreeSpots: false,
       parkingType: [0, 1],
-      additionalOptions: [],
       distanceRange: 2,
     })),
 }));

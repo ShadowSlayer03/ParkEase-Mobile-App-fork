@@ -8,6 +8,7 @@ import { destStore } from "@/store/destStore";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { userLocationStore } from "@/store/userLocationStore";
 import axios from "axios";
+import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 
 interface LocationDetails {
   parkingLotName: string;
@@ -81,35 +82,49 @@ const LocationDetails = () => {
           </Svg>
         </TouchableOpacity>
       </View>
-      <View className="mt-5 mx-2">
-        <Text className="text-xl font-FunnelDisplayBold">
-          {locationDetails?.parkingLotName}
-        </Text>
-        <Text className="text-base font-FunnelDisplayMedium">
-          Coordinates: {locationDetails?.latitude.toFixed(4)},{" "}
-          {locationDetails?.longitude.toFixed(4)}
-        </Text>
-      </View>
-      <ScrollView
-        className="mx-2"
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-      >
-        <View className="flex flex-row gap-3 py-4">
-          <Text className="text-base font-FunnelDisplayMedium py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails?.distance} km
+      {
+        locationDetails?
+        <>
+          <View className="mt-5 mx-2">
+          <Text className="text-xl font-FunnelDisplayBold">
+            {locationDetails?.parkingLotName}
           </Text>
-          <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails?.totalSlots} spots present
+          <Text className="text-base font-FunnelDisplayMedium">
+            Coordinates: {locationDetails?.latitude.toFixed(4)},{" "}
+            {locationDetails?.longitude.toFixed(4)}
           </Text>
-          <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails?.filledSlots} spots filled
-          </Text>
-          <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
-            {locationDetails?.availableSlots} spots available
-          </Text>
-        </View>
-      </ScrollView>
+          </View>
+          <ScrollView
+            className="mx-2"
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          >
+            <View className="flex flex-row gap-3 py-4">
+              <Text className="text-base font-FunnelDisplayMedium py-1 px-2 rounded-full bg-primary-200">
+                {locationDetails?.distance} km
+              </Text>
+              <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
+                {locationDetails?.totalSlots} spots present
+              </Text>
+              <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
+                {locationDetails?.filledSlots} spots filled
+              </Text>
+              <Text className="font-FunnelDisplayMedium text-base py-1 px-2 rounded-full bg-primary-200">
+                {locationDetails?.availableSlots} spots available
+              </Text>
+            </View>
+          </ScrollView>
+        </>
+        :
+        <>
+          <ShimmerPlaceholder
+            style={{ height: 20, width: 200, borderRadius: 4, marginBottom: 8 }}
+          />
+          <ShimmerPlaceholder
+            style={{ height: 16, width: 250, borderRadius: 4 }}
+          />
+        </>
+      }
       <View className="mx-2 mb-5">
         <CustomButton
           bgVariant="dark"

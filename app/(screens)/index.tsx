@@ -1,4 +1,3 @@
-import { markers } from "@/constants/parking-areas/markers";
 import Filters from "@/components/Filters";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import LocationDetails from "@/components/LocationDetails";
@@ -11,12 +10,25 @@ import { Text, TouchableOpacity, View, BackHandler, Alert } from "react-native";
 import { Path, Svg } from "react-native-svg";
 import axios from 'axios'
 import { userLocationStore } from "@/store/userLocationStore";
+import TransformedData from "@/types/transformedData";
+
+interface ParkingLot {
+  id: string;
+  latitude: number;
+  longitude: number;
+  name: string;
+  totalSlots: number;
+  location: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const Map = () => {
   const { showDestDetails, setShowDestDetails, setDest } = destStore();
   const [showFilter, setShowFilter] = useState(false);
   const [googleSearch, setGoogleSearch] = useState(false);
   const [numSlotsNearMe, setNumSlotsNearMe] = useState(0);
+  const [markers, setMarkers] = useState<null | TransformedData[]>(null);
 
   const [showList, setShowList] = useState(false);
   const router = useRouter();
@@ -45,7 +57,8 @@ const Map = () => {
     setShowList((prev) => !prev);
   };
   const handleListItemClick = (ind: number) => {
-    setDest(markers[ind]);
+    if(markers)
+      setDest(markers[ind]);
     setShowFilter(false);
     setShowList(false);
   };
@@ -86,16 +99,27 @@ const Map = () => {
   const fetchNumberOfSlotsNearMe = async () => {
     const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-    if(!backendURL) console.error("Could not get BACKEND_URL from .env");
+    if (!backendURL) console.error("Could not get BACKEND_URL from .env");
 
     try {
+      console.log("api called to fill markers")
       const response = await axios.post(`${backendURL}/api/nearby-parking-lots`, {
         userLat: userLocation?.latitude,
         userLon: userLocation?.longitude
       })
 
+      const answer: TransformedData[] = response?.data?.map((val: ParkingLot) => {
+        return {
+          latitude: val.latitude,
+          longitude: val.longitude,
+          name: val.name,
+        };
+      });
+
+     setMarkers(answer)
+
       const num = response.data.length;
-      console.log('Response from fetchNumberOfSlotsNearMe:',num);
+      console.log('Response from fetchNumberOfSlotsNearMe:', num);
 
       setNumSlotsNearMe(num)
 
@@ -112,7 +136,7 @@ const Map = () => {
 
   return (
     <View className="relative h-full bg-black">
-      <MapParking />
+      <MapParking markers={markers} />
       {/* Top bar - list of the parking lots */}
       <View className="absolute w-screen mt-10">
         <View className="flex items-center mx-4">

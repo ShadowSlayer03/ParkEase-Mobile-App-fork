@@ -110,6 +110,8 @@ function useLocationAndProximity({
   const { navigationStatus } = destStore();
   const [heading, setHeading] = useState(0);
 
+  console.log("useLocationAndProximity called");
+
   const boundaries: Record<string, [number, number][]> = {
     "NIE Admin": [
       [12.283582199560623, 76.64153444198031],
@@ -124,10 +126,10 @@ function useLocationAndProximity({
       [12.280782298270891, 76.6410343833564],
     ],
     "Tru Lit Herbals": [
-      [12.27596784244327, 76.64320259367528],
-      [12.275950705027416, 76.64336718514464],
-      [12.275842607455598, 76.64319854634407],
-      [12.275835357007116, 76.6433287354981]
+      [12.275966996524806, 76.64321126748949],
+      [12.275952581685294, 76.643366165065],
+      [12.275843159923264, 76.64319919754854],
+      [12.275832676398762, 76.64334336628765]
     ]
   };
 
