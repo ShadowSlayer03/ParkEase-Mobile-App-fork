@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Image } from "expo-image";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps"; // Import Region type
 import MapViewDirections from "react-native-maps-directions";
-import * as Location from "expo-location"
+import * as Location from "expo-location";
 import { icons } from "@/constants";
-//import { markers } from "@/constants/parking-areas/markers";
 import { destStore } from "@/store/destStore";
 import destTypes from "@/types/destTypes";
 import AlertBanner from "./Alert";
@@ -19,19 +18,20 @@ interface AppProps {
   markers: TransformedData[] | null;
 }
 
-export default function App({markers}:AppProps) {
+export default function App({ markers }: AppProps) {
   const mapRef = useRef<MapView>(null);
-  const { destDetails, setDest, navigationStatus, showDestDetails } =
-    destStore();
+  const { destDetails, setDest, navigationStatus, showDestDetails } = destStore();
   const { showAlert, setShowAlert, setStatusCode, setMsg } = alertStore();
+  const [initialRegion, setInitialRegion] = useState<Region | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
 
   const EXPO_PUBLIC_GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
   useEffect(() => {
-    if (markers) console.log("Markers are loaded successfully!")
-  }, [markers])
+    if (markers) console.log("Markers are loaded successfully!");
+  }, [markers]);
 
   useEffect(() => {
     if (!EXPO_PUBLIC_GOOGLE_API_KEY) {
@@ -53,6 +53,14 @@ export default function App({markers}:AppProps) {
           return;
         }
 
+        const location = await Location.getCurrentPositionAsync({});
+        setInitialRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+        setIsLoading(false);
       } catch (error) {
         console.error("Error while requesting location permissions:", error);
         setShowAlert();
@@ -62,7 +70,6 @@ export default function App({markers}:AppProps) {
     };
 
     getLocationPermissions();
-
   }, []);
 
   const onMarkerSelected = (area: destTypes) => {
@@ -78,46 +85,27 @@ export default function App({markers}:AppProps) {
     },
   });
 
-  const INITIAL_REGION = {
-    latitude: 12.275869,
-    longitude: 76.643237,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
+  if (isLoading) {
+    return null; // or a loading spinner
+  }
 
   return (
     <View className="relative h-full">
-
       <MapView
         className="h-full"
         style={styles.map}
         customMapStyle={mapStyle}
         provider={PROVIDER_GOOGLE}
-        initialRegion={INITIAL_REGION}
+        initialRegion={initialRegion}
         showsMyLocationButton={false}
         showsUserLocation={true}
         zoomControlEnabled={true}
         zoomEnabled={true}
         ref={mapRef}
-        loadingEnabled = {true}
-        loadingIndicatorColor="#666666"
-        loadingBackgroundColor="#eeeeee"
-        moveOnMarkerPress = {false}
+        moveOnMarkerPress={false}
         showsCompass={true}
-        showsPointsOfInterest = {false}
+        showsPointsOfInterest={false}
       >
-        {/* Custom User Location Marker */}
-        {/* {userLocation && (
-          <Marker coordinate={userLocation}>
-            <View style={{ transform: [{ rotate: `${heading}deg` }] }}>
-              <Image
-                style={{ transform: [{ rotate: "90deg" }] }}
-                source={icons.car_marker}
-                className="h-6 w-6"
-              />
-            </View>
-          </Marker>
-        )} */}
         {markers?.map((area, ind) => {
           return (
             <View key={ind}>

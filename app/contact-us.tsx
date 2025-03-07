@@ -10,7 +10,7 @@ import axios from "axios";
 export default function ContactUs() {
   const { user } = useUser();
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSendMessage = async () => {

@@ -7,17 +7,14 @@ const Activity = () => {
   return (
     <SafeAreaView className="p-7 h-full bg-[#fcd904]">
       <View className="mt-5">
-        <Text className="text-4xl font-FunnelDisplayBold">Activity</Text>
+        <Text className="text-4xl font-FunnelDisplayBold">Your Activity</Text>
       </View>
       <ScrollView className="mt-12">
         {previousRides.map((item, ind) => {
           return (
             <View key={ind} className="flex p-4 bg-black rounded-xl mb-5">
               <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
-                From: {item.origin}
-              </Text>
-              <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
-                To: {item.destination}
+                Parking Lot: {item.destination}
               </Text>
               <Text className="font-FunnelSansMedium text-[16px] text-[#fcd904]">
                 Date: {item.time}

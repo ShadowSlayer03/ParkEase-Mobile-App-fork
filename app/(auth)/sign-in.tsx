@@ -1,5 +1,5 @@
-import React from "react";
-import { useSignIn, useUser } from "@clerk/clerk-expo";
+import React, { useEffect } from "react";
+import { useSignIn, useUser, useOAuth } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { Text, View, ScrollView } from "react-native";
 import { Image } from "expo-image";
@@ -9,9 +9,25 @@ import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { alertStore } from "@/store/alertStore";
 import AlertBanner from "@/components/Alert";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+
+export const useWarmUpBrowser = () => {
+  useEffect(() => {
+    void WebBrowser.warmUpAsync();
+    return () => {
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
+};
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Page() {
+  useWarmUpBrowser();
+
   const { signIn, setActive, isLoaded } = useSignIn();
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
@@ -19,14 +35,14 @@ export default function Page() {
   const { setStatusCode, setMsg, showAlert, setShowAlert } = alertStore();
   const user = useUser();
 
-  if (user?.isSignedIn) {
-    router.push("(screens)");
-  }
+  useEffect(() => {
+    if (user?.isSignedIn) {
+      router.push("(screens)");
+    }
+  }, [user?.isSignedIn]);
 
   const onSignInPress = React.useCallback(async () => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     if (!emailAddress || !password) {
       setShowAlert();
@@ -52,6 +68,20 @@ export default function Page() {
       setShowAlert();
     }
   }, [isLoaded, emailAddress, password]);
+
+  const onGoogleSignInPress = React.useCallback(async () => {
+    try {
+      const { createdSessionId, setActive: setActiveGoogle } =
+        await startOAuthFlow({
+          redirectUrl: Linking.createURL("/sign-in"),
+        });
+      if (createdSessionId) {
+        await setActiveGoogle!({ session: createdSessionId });
+      }
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+    }
+  }, []);
 
   return (
     <LinearGradient
@@ -85,7 +115,7 @@ export default function Page() {
               label="Password"
               placeholder="Enter password"
               icon={icons.lock}
-              secureTextEntry={true}
+              secureTextEntry
               textContentType="password"
               value={password}
               onChangeText={(password:string) => setPassword(password)}
@@ -97,25 +127,23 @@ export default function Page() {
               bgVariant="dark"
               textVariant="main"
             />
+            <CustomButton
+              title="Sign In with Google"
+              onPress={onGoogleSignInPress}
+              className="mt-5"
+              bgVariant="less-dark"
+              textVariant="primary"
+            />
           </View>
-          <View>
-            <Link
-              href="/sign-up"
-              className="font-FunnelSansSemiBold text-md text-center text-general-200 mt-10"
-            >
-              Don't have an account?
-              <Text className=" text-primary-500"> Sign Up</Text>
-            </Link>
-          </View>
-          <View>
-            <Link
-              href="/forget-password"
-              className="font-FunnelSansSemiBold text-md text-center text-general-200 mt-1"
-            >
-              Forgot your password?
-              <Text className="text-primary-500"> Click Here!</Text>
-            </Link>
-          </View>
+        </View>
+        <View>
+          <Link
+            href="/sign-up"
+            className="font-FunnelSansSemiBold text-md text-center text-general-200 mt-2"
+          >
+            Don't have an account?{" "}
+            <Text className="text-primary-500">Sign Up</Text>
+          </Link>
         </View>
       </ScrollView>
     </LinearGradient>

@@ -18,22 +18,18 @@ export const markers = [
 
 export const previousRides = [
 	{
-		origin:"MC PG",
 		destination:"GJB",
 		time:"2 Nov"
 	},
 	{
-		origin:"Mall Of Mysore",
 		destination:"Admin Block",
 		time:"26 Oct"
 	},
 	{
-		origin:"Nexus Mall",
 		destination:"GJB",
 		time:"20 Oct"
 	},
 	{
-		origin:"Karangi lake",
 		destination:"Admin Block",
 		time:"13 Oct"
 	}

@@ -8,20 +8,12 @@ import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { Text, TouchableOpacity, View, BackHandler, Alert } from "react-native";
 import { Path, Svg } from "react-native-svg";
-import axios from 'axios'
+import axios from "axios";
 import { userLocationStore } from "@/store/userLocationStore";
 import TransformedData from "@/types/transformedData";
+import LotSearchTextInput from "@/components/LotSearchTextInput";
+import ParkingLot from "@/types/ParkingSlot";
 
-interface ParkingLot {
-  id: string;
-  latitude: number;
-  longitude: number;
-  name: string;
-  totalSlots: number;
-  location: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const Map = () => {
   const { showDestDetails, setShowDestDetails, setDest } = destStore();
@@ -34,8 +26,8 @@ const Map = () => {
   const router = useRouter();
   const { userLocation } = userLocationStore();
 
-  const { isSignedIn } = useUser();
-  if (!isSignedIn) {
+  const { user } = useUser();
+  if (!user) {
     router.push("(auth)/sign-in");
   }
 
@@ -57,10 +49,19 @@ const Map = () => {
     setShowList((prev) => !prev);
   };
   const handleListItemClick = (ind: number) => {
-    if(markers)
-      setDest(markers[ind]);
+    if (markers) setDest(markers[ind]);
     setShowFilter(false);
     setShowList(false);
+  };
+
+  const handleLotSelection = (lot: ParkingLot) => {
+    console.log("Triggered handleLotSelection..");
+    setDest({
+      name: lot.name,
+      latitude: lot.latitude,
+      longitude: lot.longitude,
+    });
+    setGoogleSearch(false);
   };
 
   // Handle the back button press
@@ -102,36 +103,42 @@ const Map = () => {
     if (!backendURL) console.error("Could not get BACKEND_URL from .env");
 
     try {
-      console.log("api called to fill markers")
-      const response = await axios.post(`${backendURL}/api/nearby-parking-lots`, {
-        userLat: userLocation?.latitude,
-        userLon: userLocation?.longitude
-      })
+      console.log("Filling Markers..");
+      const response = await axios.post(
+        `${backendURL}/api/nearby-parking-lots`,
+        {
+          userLat: userLocation?.latitude,
+          userLon: userLocation?.longitude,
+        }
+      );
 
-      const answer: TransformedData[] = response?.data?.map((val: ParkingLot) => {
-        return {
-          latitude: val.latitude,
-          longitude: val.longitude,
-          name: val.name,
-        };
-      });
+      const answer: TransformedData[] = response?.data?.map(
+        (val: ParkingLot) => {
+          return {
+            latitude: val.latitude,
+            longitude: val.longitude,
+            name: val.name,
+          };
+        }
+      );
 
-     setMarkers(answer)
+      setMarkers(answer);
 
       const num = response.data.length;
-      console.log('Response from fetchNumberOfSlotsNearMe:', num);
+      console.log("Response from fetchNumberOfSlotsNearMe:", num);
 
-      setNumSlotsNearMe(num)
-
+      setNumSlotsNearMe(num);
     } catch (error: any) {
-      console.error('Error fetching the number of slots near me:', error.message)
+      console.error(
+        "Error fetching the number of slots near me:",
+        error.message
+      );
     }
-  }
+  };
 
   useEffect(() => {
     //fetchParkingLots();
-    if (userLocation)
-      fetchNumberOfSlotsNearMe()
+    if (userLocation) fetchNumberOfSlotsNearMe();
   }, []);
 
   return (
@@ -141,12 +148,11 @@ const Map = () => {
       <View className="absolute w-screen mt-10">
         <View className="flex items-center mx-4">
           {googleSearch ? (
-            <GoogleTextInput
+            <LotSearchTextInput
               initialLocation={"Search parking slots by name"}
-              containerStyle={"  "}
-              handlePress={() => {
-                setGoogleSearch(false);
-              }}
+              containerStyle={""}
+              handlePress={() => setGoogleSearch(false)}
+              onSelectLot={handleLotSelection}
             />
           ) : (
             <View className="rounded-2xl w-full bg-black flex flex-row justify-between px-2 py-4">

@@ -34,6 +34,8 @@ const LocationDetails = () => {
 
     if (!backendURL) console.error("Could not get BACKEND_URL from .env");
 
+    console.log("Inside fetchlocationdetails..");
+
     try {
       const response = await axios.post(`${backendURL}/api/lot-details`,{
         parkingLotName: destDetails?.name,
