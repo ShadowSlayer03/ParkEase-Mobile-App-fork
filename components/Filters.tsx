@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Switch,
   Text,
@@ -24,22 +24,36 @@ import {
 import Slider from "@react-native-community/slider";
 import { filterStore } from "@/store/filterStore";
 import CustomButton from "./CustomButton";
+import { debounce } from "lodash";
 
 interface FiltersProps {
   setShowFilter: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Filters = ({ setShowFilter }:FiltersProps) => {
-  const [isEnabled, setIsEnabld] = useState(false);
-  const [distanceMetric, setDitanceMetric] = useState("km");
-  const [isSliderActive, setIsSliderActive] = useState(false);
+interface AllFilterValues {
+  enableFreeSlotsOnly: boolean;
+  distanceValue: number;
+}
 
-  const { setDistanceRange, distanceRange } = filterStore();
+const Filters = ({ setShowFilter }: FiltersProps) => {
+  const [distanceMetric, setDistanceMetric] = useState("km");
+  const [isSliderActive, setIsSliderActive] = useState(false);
+  const { setShowOnlyFreeSpots, setDistanceRange, clearAll } = filterStore();
+  const [allFilterValues, setAllFilterValues] = useState<AllFilterValues>({
+    enableFreeSlotsOnly: false,
+    distanceValue: 20,
+  });
+  const sliderValueRef = useRef(allFilterValues.distanceValue);
+
+  // Animations for the Filter Sheet \\
+  useEffect(() => {
+    offset.value = withSpring(0, { stiffness: 150, damping: 25 });
+  }, []);
+
+  const offset = useSharedValue(1000);
   const toggleSheet = () => {
     setShowFilter(false);
   };
-
-  const offset = useSharedValue(1000);
 
   const translateY = useAnimatedStyle(() => ({
     transform: [{ translateY: offset.value }],
@@ -62,17 +76,45 @@ const Filters = ({ setShowFilter }:FiltersProps) => {
       }
     });
 
-  const toggleSwitch = () => {
-    setIsEnabld((previousState) => !previousState);
-  };
-
+  // Km to mile and vice-versa
   const changeMetric = () => {
-    distanceMetric === "km" ? setDitanceMetric("mile") : setDitanceMetric("km");
+    distanceMetric === "km"
+      ? setDistanceMetric("mile")
+      : setDistanceMetric("km");
   };
 
-  useEffect(() => {
-    offset.value = withSpring(0, { stiffness: 150, damping: 25 });
-  }, []);
+  // Change local state to toggle showFreeSlots
+  const onChangeShowFreeSlots = () => {
+    setAllFilterValues((prev) => ({
+      ...prev,
+      enableFreeSlotsOnly: !prev.enableFreeSlotsOnly,
+    }));
+  };
+
+  // Debounce and Update the distance from slider
+  const updateDistance = debounce((value: number) => {
+    setAllFilterValues((prev) => ({ ...prev, distanceValue: value }));
+  }, 200);
+
+  const onChangeDistanceValue = (val: number) => {
+    sliderValueRef.current = val;
+    updateDistance(val);
+  };
+
+  // Function to be executed while clicking Apply
+  const applyFilters = () => {
+    setShowOnlyFreeSpots(allFilterValues.enableFreeSlotsOnly);
+    setDistanceRange(allFilterValues.distanceValue);
+  };
+
+  // Function to be executed while clicking Clear All
+  const clearFilters = ()=>{
+    setAllFilterValues({
+      enableFreeSlotsOnly: false,
+      distanceValue: 20,
+    });
+    clearAll();
+  }
 
   return (
     <GestureHandlerRootView>
@@ -98,15 +140,17 @@ const Filters = ({ setShowFilter }:FiltersProps) => {
               <Switch
                 trackColor={{ true: "#b59801", false: "#000" }}
                 thumbColor={"#FFD602"}
-                onValueChange={toggleSwitch}
-                value={isEnabled}
+                onValueChange={onChangeShowFreeSlots}
+                value={allFilterValues.enableFreeSlotsOnly}
               />
             </View>
             <View className="flex flex-row py-3 justify-between">
-              <Text className="p-2 text-white font-FunnelDisplayMedium">Distance</Text>
+              <Text className="p-2 text-white font-FunnelDisplayMedium">
+                Distance
+              </Text>
               <View className="flex flex-row gap-4">
                 <Text className="p-2 text-white">
-                  {Math.ceil(distanceRange)}
+                  {Math.ceil(allFilterValues.distanceValue)}
                 </Text>
                 <View className="relative flex p-2 rounded-full items-center justify-center flex-row bg-primary-500">
                   <TouchableWithoutFeedback onPress={changeMetric}>
@@ -121,8 +165,12 @@ const Filters = ({ setShowFilter }:FiltersProps) => {
                     </View>
                   </TouchableWithoutFeedback>
                   <View className="flex flex-row">
-                    <Text className="text-white font-FunnelSansMedium">mile</Text>
-                    <Text className="px-1 text-white font-FunnelSansMedium">km</Text>
+                    <Text className="text-white font-FunnelSansMedium">
+                      mile
+                    </Text>
+                    <Text className="px-1 text-white font-FunnelSansMedium">
+                      km
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -135,14 +183,15 @@ const Filters = ({ setShowFilter }:FiltersProps) => {
                 <Slider
                   thumbTintColor="#FFD602"
                   minimumValue={2}
-                  maximumValue={100}
-                  onValueChange={(val) => setDistanceRange(val)}
+                  maximumValue={20}
+                  value={allFilterValues.distanceValue}
+                  onValueChange={onChangeDistanceValue}
                   minimumTrackTintColor="#FFD602"
                 />
               </TouchableWithoutFeedback>
               <View className="flex px-2 flex-row w-full justify-between">
                 <Text className="text-white">2</Text>
-                <Text className="text-white">100</Text>
+                <Text className="text-white">20</Text>
               </View>
             </View>
             <View></View>
@@ -151,18 +200,14 @@ const Filters = ({ setShowFilter }:FiltersProps) => {
           <View className="flex-row space-x-4 p-3">
             <View className="flex-1">
               <CustomButton
-                onPress={() => {
-                  /* Handle clear action here */
-                }}
+                onPress={clearFilters}
                 title="Clear All"
                 bgVariant="less-dark"
               />
             </View>
             <View className="flex-1">
               <CustomButton
-                onPress={() => {
-                  /* Handle clear action here */
-                }}
+                onPress={applyFilters}
                 title="Apply"
                 bgVariant="dark"
               />

@@ -37,7 +37,7 @@ const ParkingArea = () => {
 
   useEffect(() => {
       const backAction = () => {
-          Alert.alert("Hold on!", "Was i helpful?", [
+          Alert.alert("Hold on!", "Was I helpful?", [
             {
               text: "Cancel",
               onPress: () => null,
@@ -79,7 +79,7 @@ const ParkingArea = () => {
       }
     });
 
-    setSpotsInfo(newArr); // Update state with the new array
+    setSpotsInfo(newArr);
     setFilled(targetLot.slots.filter((slot) => slot.status).length);
   };
 

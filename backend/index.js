@@ -79,17 +79,36 @@ app.post("/api/nearby-parking-lots", async (req, res) => {
   }
 
   try {
-    const parkingLots = await prisma.parkingLot.findMany();
-
-    const nearbyParkingLots = parkingLots.filter((lot) => {
-      const distance = calculateDistanceInKM(
-        userLat,
-        userLon,
-        lot.latitude,
-        lot.longitude
-      );
-      return distance <= 10;
+    const parkingLots = await prisma.parkingLot.findMany({
+      include: {
+        slots: true,
+      },
     });
+
+    const nearbyParkingLots = parkingLots
+      .map((lot) => {
+        const distance = calculateDistanceInKM(
+          userLat,
+          userLon,
+          lot.latitude,
+          lot.longitude
+        );
+
+        if (distance <= 20) {
+          const availableSlots = lot.slots.filter((slot) => slot.status).length;
+          return {
+            id: lot.id,
+            name: lot.name,
+            location: lot.location,
+            latitude: lot.latitude,
+            longitude: lot.longitude,
+            totalSlots: lot.totalSlots,
+            availableSlots,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
 
     res.json(nearbyParkingLots);
   } catch (error) {
@@ -97,6 +116,8 @@ app.post("/api/nearby-parking-lots", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
 
 app.post("/api/lot-details", async (req, res) => {
   const { parkingLotName, userLat, userLon } = req.body;

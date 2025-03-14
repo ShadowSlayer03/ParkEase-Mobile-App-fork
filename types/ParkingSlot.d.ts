@@ -4,6 +4,8 @@ interface ParkingLot {
   location: string;
   latitude: number;
   longitude: number;
+  totalSlots: number;
+  availableSlots: number;
 }
 
 export default ParkingLot;

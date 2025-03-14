@@ -52,7 +52,6 @@ export default function Index() {
       if (!backendURL) console.error("Could not get BACKEND_URL from .env");
 
       const response = await axios.get(`${backendURL}/api/parking-lots`);
-      console.log("Response:", response);
   
       setData(response.data);
     } catch (err: any) {

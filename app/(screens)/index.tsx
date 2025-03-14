@@ -118,6 +118,7 @@ const Map = () => {
             latitude: val.latitude,
             longitude: val.longitude,
             name: val.name,
+            availableSlots: val.availableSlots
           };
         }
       );

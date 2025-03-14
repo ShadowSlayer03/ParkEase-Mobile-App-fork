@@ -9,6 +9,8 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { userLocationStore } from "@/store/userLocationStore";
 import axios from "axios";
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
+import { useActivityStore } from "@/store/activityStore";
+import getDateAndMonth from "@/utils/getDateAndMonth";
 
 interface LocationDetails {
   parkingLotName: string;
@@ -24,9 +26,14 @@ const LocationDetails = () => {
   const { destDetails, clearDest, setNavigationStatus } = destStore();
   const { userLocation } = userLocationStore();
   const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
+  const {addRide} = useActivityStore(); 
 
   const navigateToDest = () => {
     setNavigationStatus(true);
+    addRide({
+      destination: locationDetails?.parkingLotName || "Undefined Dest",
+      time: getDateAndMonth(new Date())
+    })
   };
 
   const fetchLocationDetails = async () => {

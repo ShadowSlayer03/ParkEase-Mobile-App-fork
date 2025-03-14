@@ -19,18 +19,18 @@ export const markers = [
 export const previousRides = [
 	{
 		destination:"GJB",
-		time:"2 Nov"
+		date:"2 Nov"
 	},
 	{
 		destination:"Admin Block",
-		time:"26 Oct"
+		date:"26 Oct"
 	},
 	{
 		destination:"GJB",
-		time:"20 Oct"
+		date:"20 Oct"
 	},
 	{
 		destination:"Admin Block",
-		time:"13 Oct"
+		date:"13 Oct"
 	}
 ]
