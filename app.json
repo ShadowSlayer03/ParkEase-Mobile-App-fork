@@ -2,6 +2,7 @@
   "expo": {
     "name": "ParkEase",
     "slug": "ParkEase",
+    "owner": "shadowslayer03",
     "output": "server",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -51,7 +52,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "dbc15c8d-d73b-4653-955a-8e2576df8f54"
+        "projectId": "4065c939-23f4-4ac1-a1ce-b161d35a9666"
       }
     }
   }
