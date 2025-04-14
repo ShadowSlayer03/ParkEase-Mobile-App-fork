@@ -23,7 +23,6 @@ export default function Profile() {
         hour: "numeric",
         minute: "numeric",
       });
-      //console.log("Formatted Date:",readableDate);
       setFormattedDate(readableDate);
     }
   }, [user]);
@@ -43,7 +42,7 @@ export default function Profile() {
             try {
               await signOut();
               console.log("User signed out successfully");
-              router.push("(auth)");
+              router.push("(auth)/welcome");
             } catch (error) {
               console.error("Error signing out:", error);
             }
@@ -65,7 +64,7 @@ export default function Profile() {
         <View className="flex flex-col items-center">
           <View className="flex justify-center items-center m-4">
             <Text className="font-FunnelDisplayExtraBold text-4xl">
-              {user?.username || "My Username"}
+              {user?.firstName || "My Firstname"}
             </Text>
           </View>
 
@@ -76,15 +75,15 @@ export default function Profile() {
             />
           </View>
 
-          <View className="flex gap-4 justify-start items-start mt-4">
-            <Text className="text-[18px] font-FunnelSansMedium">
-              Unique ID: {user?.id || "No ID"}
-            </Text>
+          <View className="flex w-[330px] gap-4 mt-4">
             <Text className="text-[18px] font-FunnelSansMedium">
               Full Name: {user?.fullName || "No Data"}
             </Text>
             <Text className="text-[18px] font-FunnelSansMedium">
               Email Address: {user?.emailAddresses[0].emailAddress || "No Data"}
+            </Text>
+            <Text className="text-[18px] font-FunnelSansMedium">
+            Unique ID: {user?.id ? (user.id.length > 10 ? `${user.id.slice(0, 20)}...` : user.id) : "No ID"}
             </Text>
             <Text className="text-[18px] font-FunnelSansMedium">
               Last Sign In: {formattedDate || "No Data"}

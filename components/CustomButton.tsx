@@ -20,7 +20,7 @@ const getBgVariantStyle = (variant: ButtonProps["bgVariant"]) => {
       return "bg-[#fcd904]";
       break;
     case "less-dark":
-      return "bg-[#57595d]";
+      return "bg-[#ebd231]";
       break;
     case "dark":
       return "bg-[#000]";
@@ -49,7 +49,7 @@ const getTextVariantStyle = (variant: ButtonProps["textVariant"]) => {
     case "main":
       return "text-[#fcd904]";
       break;
-    default:
+    case "default":
       return "text-white";
   }
 };
@@ -57,7 +57,7 @@ const getTextVariantStyle = (variant: ButtonProps["textVariant"]) => {
 const CustomButton = ({
   onPress,
   title,
-  bgVariant = "primary",
+  bgVariant = "main",
   textVariant = "default",
   IconLeft,
   IconRight,

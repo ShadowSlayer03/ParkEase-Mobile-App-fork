@@ -1,4 +1,3 @@
-import { markers } from "@/constants/parking-areas/markers";
 import Filters from "@/components/Filters";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import LocationDetails from "@/components/LocationDetails";
@@ -9,21 +8,26 @@ import { useRouter } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { Text, TouchableOpacity, View, BackHandler, Alert } from "react-native";
 import { Path, Svg } from "react-native-svg";
-import axios from 'axios'
+import axios from "axios";
 import { userLocationStore } from "@/store/userLocationStore";
+import TransformedData from "@/types/transformedData";
+import LotSearchTextInput from "@/components/LotSearchTextInput";
+import ParkingLot from "@/types/ParkingSlot";
+
 
 const Map = () => {
   const { showDestDetails, setShowDestDetails, setDest } = destStore();
   const [showFilter, setShowFilter] = useState(false);
   const [googleSearch, setGoogleSearch] = useState(false);
   const [numSlotsNearMe, setNumSlotsNearMe] = useState(0);
+  const [markers, setMarkers] = useState<null | TransformedData[]>(null);
 
   const [showList, setShowList] = useState(false);
   const router = useRouter();
   const { userLocation } = userLocationStore();
 
-  const { isSignedIn } = useUser();
-  if (!isSignedIn) {
+  const { user } = useUser();
+  if (!user) {
     router.push("(auth)/sign-in");
   }
 
@@ -45,9 +49,19 @@ const Map = () => {
     setShowList((prev) => !prev);
   };
   const handleListItemClick = (ind: number) => {
-    setDest(markers[ind]);
+    if (markers) setDest(markers[ind]);
     setShowFilter(false);
     setShowList(false);
+  };
+
+  const handleLotSelection = (lot: ParkingLot) => {
+    console.log("Triggered handleLotSelection..");
+    setDest({
+      name: lot.name,
+      latitude: lot.latitude,
+      longitude: lot.longitude,
+    });
+    setGoogleSearch(false);
   };
 
   // Handle the back button press
@@ -86,43 +100,60 @@ const Map = () => {
   const fetchNumberOfSlotsNearMe = async () => {
     const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-    if(!backendURL) console.error("Could not get BACKEND_URL from .env");
+    if (!backendURL) console.error("Could not get BACKEND_URL from .env");
 
     try {
-      const response = await axios.post(`${backendURL}/api/nearby-parking-lots`, {
-        userLat: userLocation?.latitude,
-        userLon: userLocation?.longitude
-      })
+      console.log("Filling Markers..");
+      const response = await axios.post(
+        `${backendURL}/api/nearby-parking-lots`,
+        {
+          userLat: userLocation?.latitude,
+          userLon: userLocation?.longitude,
+        }
+      );
+
+      const answer: TransformedData[] = response?.data?.map(
+        (val: ParkingLot) => {
+          return {
+            latitude: val.latitude,
+            longitude: val.longitude,
+            name: val.name,
+            availableSlots: val.availableSlots
+          };
+        }
+      );
+
+      setMarkers(answer);
 
       const num = response.data.length;
-      console.log('Response from fetchNumberOfSlotsNearMe:',num);
+      console.log("Response from fetchNumberOfSlotsNearMe:", num);
 
-      setNumSlotsNearMe(num)
-
+      setNumSlotsNearMe(num);
     } catch (error: any) {
-      console.error('Error fetching the number of slots near me:', error.message)
+      console.error(
+        "Error fetching the number of slots near me:",
+        error.message
+      );
     }
-  }
+  };
 
   useEffect(() => {
     //fetchParkingLots();
-    if (userLocation)
-      fetchNumberOfSlotsNearMe()
+    if (userLocation) fetchNumberOfSlotsNearMe();
   }, []);
 
   return (
     <View className="relative h-full bg-black">
-      <MapParking />
+      <MapParking markers={markers} />
       {/* Top bar - list of the parking lots */}
       <View className="absolute w-screen mt-10">
         <View className="flex items-center mx-4">
           {googleSearch ? (
-            <GoogleTextInput
+            <LotSearchTextInput
               initialLocation={"Search parking slots by name"}
-              containerStyle={"  "}
-              handlePress={() => {
-                setGoogleSearch(false);
-              }}
+              containerStyle={""}
+              handlePress={() => setGoogleSearch(false)}
+              onSelectLot={handleLotSelection}
             />
           ) : (
             <View className="rounded-2xl w-full bg-black flex flex-row justify-between px-2 py-4">

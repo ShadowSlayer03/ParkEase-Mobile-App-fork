@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import { SplashScreen, useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { Alert, SafeAreaView, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useUser } from "@clerk/clerk-expo";
 import CustomButton from "@/components/CustomButton";
 import { images } from "@/constants";
 import { getUserLocation } from "@/utils/getUserLocation";
 import { userLocationStore } from "@/store/userLocationStore";
+import axios from "axios";
 
 export default function Index() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const { setUserLocation } = userLocationStore();
   const router = useRouter();
+  const [data,setData] = useState([]);
+  const [error,setError] = useState("");
 
   const [loaded] = useFonts({
     "Funnel-Sans-Bold": require("../assets/fonts/FunnelSans-Bold.ttf"),
@@ -36,19 +39,24 @@ export default function Index() {
     }
   }, [loaded]);
 
+  useEffect(()=>{
+    console.log("User after logging in:",user);
+  },[user])
+
   // Async function to fetch data
   const fetchData = async () => {
     try {
-      setIsLoading(true);
-      const response = await axios.get("http://localhost:3000/api/parking-lots");
-      console.log("Response:", response);
+      const backendURL = process.env.EXPO_PUBLIC_BACKEND_URL;
+      // console.log("Backend URL from env:",backendURL);
+
+      if (!backendURL) console.error("Could not get BACKEND_URL from .env");
+
+      const response = await axios.get(`${backendURL}/api/parking-lots`);
   
-      setData(response.data); // Axios automatically parses the response as JSON
+      setData(response.data);
     } catch (err: any) {
       setError(err.message || "An error occurred");
-      Alert.alert("Error", "Failed to load data");
-    } finally {
-      setIsLoading(false);
+      Alert.alert("Error", "Failed to load parking slots data");
     }
   };
 

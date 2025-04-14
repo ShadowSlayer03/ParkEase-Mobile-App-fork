@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Image } from "expo-image";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import * as Location from "expo-location"
+import * as Location from "expo-location";
 import { icons } from "@/constants";
-import { markers } from "@/constants/parking-areas/markers";
 import { destStore } from "@/store/destStore";
 import destTypes from "@/types/destTypes";
 import AlertBanner from "./Alert";
@@ -13,20 +12,24 @@ import { alertStore } from "@/store/alertStore";
 import { useRouter } from "expo-router";
 import useLocationAndProximity from "@/hooks/useLocationAndProximity";
 import focusMap from "@/utils/focusMap";
+import TransformedData from "@/types/transformedData";
+import { filterStore } from "@/store/filterStore";
+import getDistance from "geolib/es/getDistance";
 
-export default function App() {
+interface AppProps {
+  markers: TransformedData[] | null;
+}
+
+export default function App({ markers }: AppProps) {
   const mapRef = useRef<MapView>(null);
-  const { destDetails, setDest, navigationStatus, showDestDetails } =
-    destStore();
+  const { destDetails, setDest, navigationStatus } = destStore();
   const { showAlert, setShowAlert, setStatusCode, setMsg } = alertStore();
-
+  const { showOnlyFreeSpots, distanceRange } = filterStore();
+  const [initialRegion, setInitialRegion] = useState<Region | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const EXPO_PUBLIC_GOOGLE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
-
-  useEffect(() => {
-    if (markers) console.log("Markers are loaded successfully!")
-  }, [markers])
 
   useEffect(() => {
     if (!EXPO_PUBLIC_GOOGLE_API_KEY) {
@@ -36,11 +39,14 @@ export default function App() {
     }
   }, [EXPO_PUBLIC_GOOGLE_API_KEY]);
 
+  useEffect(()=>{
+    if(markers) console.log("Markers:",markers);
+  },[])
+
   useEffect(() => {
     const getLocationPermissions = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-
         if (status !== "granted") {
           setShowAlert();
           setStatusCode(401);
@@ -48,6 +54,14 @@ export default function App() {
           return;
         }
 
+        const location = await Location.getCurrentPositionAsync({});
+        setInitialRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+        setIsLoading(false);
       } catch (error) {
         console.error("Error while requesting location permissions:", error);
         setShowAlert();
@@ -55,77 +69,61 @@ export default function App() {
         setMsg("Failed to request location permissions");
       }
     };
-
     getLocationPermissions();
-
   }, []);
 
   const onMarkerSelected = (area: destTypes) => {
     setDest(area);
   };
 
-  const { userLocation, heading } = useLocationAndProximity({
+  const { userLocation } = useLocationAndProximity({
     destination: destDetails,
     onProximity: () => {
-      console.log("You have reached within 15 metres of the destination!");
+      console.log("You have reached the destination!");
       router.push("(parking)");
     },
   });
 
-  const INITIAL_REGION = {
-    latitude: 12.275869,
-    longitude: 76.643237,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
+  if (isLoading) return null;
+
+  const filteredMarkers = markers?.filter((area) => {
+    const isVacant = showOnlyFreeSpots ? area.availableSlots > 0 : true;
+    const distance = userLocation
+      ? getDistance(
+          { latitude: userLocation.latitude, longitude: userLocation.longitude },
+          { latitude: area.latitude, longitude: area.longitude }
+        ) / 1000
+      : Infinity;
+    const isWithinDistance = distance <= distanceRange;
+    return isVacant && isWithinDistance;
+  });
 
   return (
     <View className="relative h-full">
-
       <MapView
         className="h-full"
         style={styles.map}
         customMapStyle={mapStyle}
         provider={PROVIDER_GOOGLE}
-        initialRegion={INITIAL_REGION}
+        initialRegion={initialRegion}
         showsMyLocationButton={false}
         showsUserLocation={true}
         zoomControlEnabled={true}
         zoomEnabled={true}
         ref={mapRef}
+        moveOnMarkerPress={false}
+        showsCompass={true}
+        showsPointsOfInterest={false}
       >
-        {/* Custom User Location Marker */}
-        {/* {userLocation && (
-          <Marker coordinate={userLocation}>
-            <View style={{ transform: [{ rotate: `${heading}deg` }] }}>
-              <Image
-                style={{ transform: [{ rotate: "90deg" }] }}
-                source={icons.car_marker}
-                className="h-6 w-6"
-              />
-            </View>
+        {filteredMarkers?.map((area, ind) => (
+          <Marker
+            key={ind}
+            coordinate={{ latitude: area.latitude, longitude: area.longitude }}
+            onPress={() => onMarkerSelected(area)}
+          >
+            <Image source={icons.marker_icon} className="w-9 h-9 rounded-full" />
           </Marker>
-        )} */}
-        {markers.map((area, ind) => {
-          return (
-            <View key={ind}>
-              <Marker
-                coordinate={{
-                  latitude: area.latitude,
-                  longitude: area.longitude,
-                }}
-                onPress={() => onMarkerSelected(area)}
-              >
-                <View>
-                  <Image
-                    source={icons.marker_icon}
-                    className="w-9 h-9 rounded-full"
-                  />
-                </View>
-              </Marker>
-            </View>
-          );
-        })}
+        ))}
         {userLocation && destDetails && navigationStatus && (
           <MapViewDirections
             origin={userLocation}
@@ -137,8 +135,7 @@ export default function App() {
         )}
       </MapView>
       <TouchableOpacity
-        className="absolute z-50 bottom-32 right-5"
-        style={{ zIndex: 50 }}
+        className="absolute z-20 bottom-32 right-5"
         onPress={() => focusMap(mapRef)}
       >
         <Image className="h-6 w-6" source={icons.my_location_icon} />

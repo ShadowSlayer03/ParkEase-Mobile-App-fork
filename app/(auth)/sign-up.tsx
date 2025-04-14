@@ -10,57 +10,67 @@ import {
   Alert,
 } from "react-native";
 import { Image } from "expo-image";
-import { useSignUp, useUser } from "@clerk/clerk-expo";
+import { useAuth, useOAuth, useSignUp, useUser } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
+import * as WebBrowser from 'expo-web-browser'
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import { icons, images } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import AlertBanner from "@/components/Alert";
 import { alertStore } from "@/store/alertStore";
+import * as Linking from "expo-linking"
+
+export const useWarmUpBrowser = () => {
+  useEffect(() => {
+    // Preloads the browser for Android devices to reduce authentication load time
+    // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
+    void WebBrowser.warmUpAsync()
+    return () => {
+      // Cleanup: closes browser when component unmounts
+      void WebBrowser.coolDownAsync()
+    }
+  }, [])
+}
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
+  useWarmUpBrowser();
+
   const { isLoaded, signUp, setActive } = useSignUp();
   const user = useUser();
+  const {isSignedIn} = useAuth();
   const router = useRouter();
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
-  console.log(user);
+  useEffect(()=>{
+    if(isSignedIn){
+      router.push("(screens)");
+      return;
+    }
+  },[isSignedIn])
 
-  if (user?.isSignedIn) {
-    router.push("(screens)");
-    return;
-  }
-
-  const [emailAddress, setEmailAddress] = React.useState<null | string>(null);
-  const [password, setPassword] = React.useState<null | string>(null);
+  // const [username, setUsername] = React.useState<string>("");
+  const [emailAddress, setEmailAddress] = React.useState<string | null>(null);
+  const [password, setPassword] = React.useState<string | null>(null);
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState<string>("");
-  const [username, setUsername] = React.useState<null | string>(null);
 
   const { setStatusCode, setMsg, showAlert, setShowAlert } = alertStore();
 
-  //backpresshandler
+  // Back button handler
   useEffect(() => {
     const backAction = () => {
-      // You can modify this logic based on your app's needs.
-      // You can either navigate to another screen or exit the app
       Alert.alert("Hold on!", "Are you sure you want to exit?", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel",
-        },
-        {
-          text: "YES",
-          onPress: () => BackHandler.exitApp(),
-        },
+        { text: "Cancel", onPress: () => null, style: "cancel" },
+        { text: "YES", onPress: () => BackHandler.exitApp() },
       ]);
-      return true; // Prevent default back action
+      return true;
     };
 
     BackHandler.addEventListener("hardwareBackPress", backAction);
 
-    // Cleanup the listener on unmount
     return () => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
     };
@@ -69,20 +79,15 @@ export default function SignUpScreen() {
   const onSignUpPress = async () => {
     if (!isLoaded) return;
 
-    if (!emailAddress || !password || !username) {
+    if (!emailAddress || !password) {
       setShowAlert();
       setStatusCode(400);
-      setMsg("Fill All the Fields");
-      return;
-    } else if (username && username?.length < 4) {
-      setShowAlert();
-      setStatusCode(400);
-      setMsg("The username should contain atleast 4 characters");
+      setMsg("Fill all the fields");
       return;
     }
 
     try {
-      await signUp.create({ emailAddress, password, username });
+      await signUp.create({ emailAddress, password });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setPendingVerification(true);
     } catch (err: any) {
@@ -97,13 +102,10 @@ export default function SignUpScreen() {
     if (!isLoaded) return;
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
+      const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        console.log();
-        router.replace("/");
+        router.replace("(screens)");
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
@@ -111,6 +113,20 @@ export default function SignUpScreen() {
       console.log(JSON.stringify(err, null, 2));
     }
   };
+
+  const onGoogleSignInPress = React.useCallback(async () => {
+    try {
+      const { createdSessionId, setActive:setActiveGoogle } = await startOAuthFlow({
+        redirectUrl: Linking.createURL("/sign-up")
+      });
+      if (createdSessionId) {
+        console.log("CreatedSessionId:",createdSessionId);
+        await setActiveGoogle!({ session: createdSessionId });
+      }
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+    }
+  },[]);
 
   return (
     <LinearGradient
@@ -123,10 +139,7 @@ export default function SignUpScreen() {
         <View>
           {showAlert && <AlertBanner />}
           <View className="relative w-full">
-            <Image
-              source={images.parkingP}
-              className="z-0 w-[170px] h-32 mt-20 mb-10 ml-5"
-            />
+            <Image source={images.parkingP} className="z-0 w-[170px] h-32 mt-20 mb-10 ml-5" />
             <Text className="font-FunnelDisplayBold text-2xl text-black absolute bottom-5 left-5">
               Welcome Friend 👋
             </Text>
@@ -150,21 +163,16 @@ export default function SignUpScreen() {
                 value={password}
                 onChangeText={(password:string) => setPassword(password)}
               />
-              <InputField
-                label="Username"
-                placeholder="Username..."
-                icon={icons.person}
-                secureTextEntry={false}
-                textContentType="text"
-                value={username}
-                onChangeText={(username:string) => setUsername(username)}
-              />
+
+              <CustomButton title="Sign up" onPress={onSignUpPress} className="mt-10" bgVariant="dark" textVariant="main" />
+
+              {/* Google Sign-In Button */}
               <CustomButton
-                title="Sign up"
-                onPress={onSignUpPress}
-                className="mt-10"
-                bgVariant="dark"
-                textVariant="main"
+                title="Sign up with Google"
+                onPress={onGoogleSignInPress}
+                className="mt-5"
+                bgVariant="less-dark"
+                textVariant="primary"
               />
             </View>
           )}
@@ -173,25 +181,17 @@ export default function SignUpScreen() {
             <View className="p-5">
               <TextInput
                 value={code}
-                placeholder="Code..."
-                onChangeText={(code) => setCode(code)}
-                style={{ borderWidth: 1, padding: 8, marginBottom: 10 }}
+                placeholder="Enter the code..."
+                onChangeText={(text) => setCode(text)}
+                style={{ borderWidth: 2, padding: 20, borderRadius: 30 }}
               />
-              <Button
-                title="Verify Email"
-                color="#1f2937"
-                onPress={onPressVerify}
-              />
+              <CustomButton title="Verify Email" onPress={onPressVerify} className="mt-10" bgVariant="dark" textVariant="main" />
             </View>
           )}
         </View>
         <View>
-          <Link
-            href="/sign-in"
-            className="font-FunnelSansSemiBold text-md text-center text-general-200 mt-2"
-          >
-            Already have an account?{" "}
-            <Text className="text-primary-500">Sign In</Text>
+          <Link href="/sign-in" className="font-FunnelSansSemiBold text-md text-center text-general-200 mt-2">
+            Already have an account? <Text className="text-primary-500">Sign In</Text>
           </Link>
         </View>
       </ScrollView>
